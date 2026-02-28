@@ -31,3 +31,6 @@ out/
 # OS
 .DS_Store
 Thumbs.db
+
+# Assets (local reference)
+assets/book.md

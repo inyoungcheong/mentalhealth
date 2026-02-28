@@ -6,7 +6,7 @@ const geminiApiKey = defineSecret('GEMINI_API_KEY');
 
 const MODEL = 'gemini-2.5-flash';
 
-// Luna — Rachel Pollack philosophy witch (post-login)
+// Luna — 타로 마녀 (post-login)
 const WITCH_SYSTEM = `당신은 타로 마녀 루나(Luna)입니다.
 
 핵심 철학:

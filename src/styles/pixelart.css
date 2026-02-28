@@ -1,0 +1,223 @@
+/* =====================================================
+   CSS Pixel Art - Box Shadow Technique
+   All characters are built with 1px × 1px base unit
+   scaled by --pixel-size (3px default)
+   ===================================================== */
+
+/* ─── PIXEL CHILD CHARACTER ─────────────────────────── */
+/* 16×16 pixel design */
+
+.pixel-char-wrap {
+  display: inline-block;
+  position: relative;
+}
+
+/* Child character using CSS custom property for color theme */
+.pixel-child {
+  width: 3px;
+  height: 3px;
+  position: relative;
+  /* shadow pixels: x y color */
+  box-shadow:
+    /* Hair */
+    12px 0px #3d1c02, 15px 0px #3d1c02, 18px 0px #3d1c02,
+    9px 3px #3d1c02, 12px 3px #f5c5a3, 15px 3px #f5c5a3, 18px 3px #f5c5a3, 21px 3px #3d1c02,
+    /* Face */
+    9px 6px #3d1c02, 12px 6px #f5c5a3, 15px 6px #f5c5a3, 18px 6px #f5c5a3, 21px 6px #3d1c02,
+    /* Eyes */
+    9px 9px #3d1c02, 12px 9px #2d2d2d, 15px 9px #f5c5a3, 18px 9px #2d2d2d, 21px 9px #3d1c02,
+    /* Mouth */
+    9px 12px #3d1c02, 12px 12px #f5c5a3, 15px 12px #e07070, 18px 12px #f5c5a3, 21px 12px #3d1c02,
+    /* Neck */
+    12px 15px #f5c5a3, 15px 15px #f5c5a3, 18px 15px #f5c5a3,
+    /* Body (shirt - blue) */
+    9px 18px #3a7bd5, 12px 18px #3a7bd5, 15px 18px #3a7bd5, 18px 18px #3a7bd5, 21px 18px #3a7bd5,
+    9px 21px #3a7bd5, 12px 21px #3a7bd5, 15px 21px #3a7bd5, 18px 21px #3a7bd5, 21px 21px #3a7bd5,
+    9px 24px #3a7bd5, 12px 24px #3a7bd5, 15px 24px #3a7bd5, 18px 24px #3a7bd5, 21px 24px #3a7bd5,
+    /* Arms */
+    6px 18px #f5c5a3, 24px 18px #f5c5a3,
+    6px 21px #f5c5a3, 24px 21px #f5c5a3,
+    /* Pants (dark blue) */
+    9px 27px #1a3a6e, 12px 27px #1a3a6e, 15px 27px #1a3a6e, 18px 27px #1a3a6e, 21px 27px #1a3a6e,
+    9px 30px #1a3a6e, 12px 30px #1a3a6e, 15px 30px #1a3a6e, 18px 30px #1a3a6e, 21px 30px #1a3a6e,
+    /* Shoes */
+    9px 33px #2d1a02, 12px 33px #2d1a02, 18px 33px #2d1a02, 21px 33px #2d1a02;
+  transform-origin: bottom center;
+}
+
+/* ─── PIXEL WITCH CHARACTER ──────────────────────────── */
+/* 20×32 pixel design */
+
+.pixel-witch {
+  width: 3px;
+  height: 3px;
+  position: relative;
+  box-shadow:
+    /* Hat brim */
+    6px 0px #2d1a4e, 9px 0px #2d1a4e, 12px 0px #2d1a4e, 15px 0px #2d1a4e,
+    18px 0px #2d1a4e, 21px 0px #2d1a4e, 24px 0px #2d1a4e, 27px 0px #2d1a4e,
+    /* Hat body */
+    9px 3px #2d1a4e, 12px 3px #2d1a4e, 15px 3px #6b2d8b, 18px 3px #2d1a4e,
+    9px 6px #2d1a4e, 12px 6px #2d1a4e, 15px 6px #2d1a4e, 18px 6px #2d1a4e,
+    /* Hat star decoration */
+    15px 3px #ffd700,
+    /* Hair */
+    6px 9px #2d0a5a, 9px 9px #4a0e8f, 12px 9px #c5a3f5,
+    15px 9px #c5a3f5, 18px 9px #c5a3f5, 21px 9px #4a0e8f, 24px 9px #2d0a5a,
+    /* Face */
+    9px 12px #4a0e8f, 12px 12px #f5e0d5, 15px 12px #f5e0d5, 18px 12px #f5e0d5, 21px 12px #4a0e8f,
+    /* Eyes (green - witch eyes!) */
+    9px 15px #4a0e8f, 12px 15px #00c864, 15px 15px #f5e0d5, 18px 15px #00c864, 21px 15px #4a0e8f,
+    /* Mouth */
+    9px 18px #4a0e8f, 12px 18px #f5e0d5, 15px 18px #c85a5a, 18px 18px #f5e0d5, 21px 18px #4a0e8f,
+    /* Side hair flowing down */
+    6px 12px #2d0a5a, 6px 15px #4a0e8f, 6px 18px #4a0e8f,
+    24px 12px #2d0a5a, 24px 15px #4a0e8f, 24px 18px #4a0e8f,
+    /* Neck */
+    12px 21px #f5e0d5, 15px 21px #f5e0d5, 18px 21px #f5e0d5,
+    /* Robe (purple) */
+    6px 24px #6b2d8b, 9px 24px #6b2d8b, 12px 24px #6b2d8b,
+    15px 24px #6b2d8b, 18px 24px #6b2d8b, 21px 24px #6b2d8b, 24px 24px #6b2d8b,
+    6px 27px #5a2578, 9px 27px #6b2d8b, 12px 27px #7d35a0,
+    15px 27px #6b2d8b, 18px 27px #7d35a0, 21px 27px #6b2d8b, 24px 27px #5a2578,
+    /* Sleeves / arms */
+    3px 24px #5a2578, 3px 27px #5a2578,
+    27px 24px #5a2578, 27px 27px #5a2578,
+    /* Hands holding tarot */
+    3px 30px #f5e0d5, 27px 30px #f5e0d5,
+    /* Skirt */
+    3px 30px #5a2578, 6px 30px #6b2d8b, 9px 30px #6b2d8b,
+    12px 30px #7d35a0, 15px 30px #6b2d8b, 18px 30px #7d35a0,
+    21px 30px #6b2d8b, 24px 30px #6b2d8b, 27px 30px #5a2578,
+    /* Shoes (black pointy) */
+    6px 33px #1a1a1a, 9px 33px #1a1a1a,
+    21px 33px #1a1a1a, 24px 33px #1a1a1a,
+    3px 33px #1a1a1a,  27px 33px #1a1a1a;
+}
+
+/* ─── TAROT CARD PIXEL ───────────────────────────────── */
+
+.pixel-tarot-card {
+  width: 3px;
+  height: 3px;
+  box-shadow:
+    /* Card back - dark purple with gold border */
+    /* Outer border */
+    3px 0px #ffd700, 6px 0px #ffd700, 9px 0px #ffd700, 12px 0px #ffd700,
+    15px 0px #ffd700, 18px 0px #ffd700, 21px 0px #ffd700, 24px 0px #ffd700,
+    27px 0px #ffd700,
+    3px 3px #ffd700, 27px 3px #ffd700,
+    3px 6px #ffd700, 27px 6px #ffd700,
+    3px 9px #ffd700, 27px 9px #ffd700,
+    3px 12px #ffd700, 27px 12px #ffd700,
+    3px 15px #ffd700, 27px 15px #ffd700,
+    3px 18px #ffd700, 27px 18px #ffd700,
+    3px 21px #ffd700, 27px 21px #ffd700,
+    3px 24px #ffd700, 27px 24px #ffd700,
+    3px 27px #ffd700, 27px 27px #ffd700,
+    3px 30px #ffd700, 27px 30px #ffd700,
+    3px 33px #ffd700, 27px 33px #ffd700,
+    3px 36px #ffd700, 6px 36px #ffd700, 9px 36px #ffd700, 12px 36px #ffd700,
+    15px 36px #ffd700, 18px 36px #ffd700, 21px 36px #ffd700, 24px 36px #ffd700,
+    27px 36px #ffd700,
+    /* Inner fill */
+    6px 3px #1a0a2e, 9px 3px #1a0a2e, 12px 3px #1a0a2e, 15px 3px #1a0a2e,
+    18px 3px #1a0a2e, 21px 3px #1a0a2e, 24px 3px #1a0a2e,
+    /* Star pattern */
+    15px 12px #ffd700, 12px 15px #ffd700, 15px 15px #c084fc, 18px 15px #ffd700,
+    15px 18px #ffd700,
+    /* Background fill lines */
+    6px 6px #1a0a2e, 9px 6px #1a0a2e, 12px 6px #2d1a4e, 15px 6px #1a0a2e,
+    18px 6px #2d1a4e, 21px 6px #1a0a2e, 24px 6px #1a0a2e;
+}
+
+/* ─── ANIMATIONS ─────────────────────────────────────── */
+
+/* Walk cycle */
+@keyframes walk-right {
+  0%   { transform: translateX(0) scaleX(1); }
+  100% { transform: translateX(var(--walk-distance, 200px)) scaleX(1); }
+}
+
+@keyframes walk-leg-bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+}
+
+/* Idle bob */
+@keyframes idle-bob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+
+.pixel-child-animated {
+  animation: idle-bob 1.2s ease-in-out infinite;
+}
+
+.pixel-witch-animated {
+  animation: idle-bob 1.4s ease-in-out infinite;
+}
+
+/* Walking animation */
+.walking {
+  animation: walk-right 2s linear forwards, walk-leg-bob 0.3s ease-in-out infinite;
+}
+
+/* Appear animation */
+@keyframes appear-pop {
+  0%   { transform: scale(0) translateY(20px); opacity: 0; }
+  60%  { transform: scale(1.15) translateY(-4px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.appear-pop {
+  animation: appear-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Float for cards */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+.float-anim {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Shake for dice */
+@keyframes dice-shake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(-15deg) scale(1.1); }
+  30% { transform: rotate(15deg) scale(1.1); }
+  45% { transform: rotate(-10deg) scale(1.05); }
+  60% { transform: rotate(10deg) scale(1.05); }
+  75% { transform: rotate(-5deg) scale(1.02); }
+  90% { transform: rotate(5deg) scale(1.02); }
+}
+
+.dice-shake {
+  animation: dice-shake 0.6s ease-in-out;
+}
+
+/* Card flip */
+@keyframes card-flip {
+  0%   { transform: rotateY(0deg); }
+  50%  { transform: rotateY(90deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+.card-flip {
+  animation: card-flip 0.6s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+/* Sparkle */
+@keyframes sparkle {
+  0%   { opacity: 0; transform: scale(0) rotate(0deg); }
+  50%  { opacity: 1; transform: scale(1) rotate(180deg); }
+  100% { opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+.sparkle {
+  animation: sparkle 1s ease-in-out infinite;
+}

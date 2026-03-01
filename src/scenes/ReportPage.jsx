@@ -61,7 +61,7 @@ export default function ReportPage({ sessionId }) {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ fontSize: 28, color: '#ffd700', letterSpacing: 4 }}>✦ TAROT JOURNEY ✦</div>
-          <div style={{ fontSize: '11px', color: '#c5a3f5', marginTop: 12, lineHeight: 2 }}>
+          <div style={{ fontSize: '13px', color: '#d4b8f0', marginTop: 12, lineHeight: 2 }}>
             "{session?.question}"
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function ReportPage({ sessionId }) {
                 <div style={{ fontSize: '10px', color: '#ffd700', marginBottom: 12 }}>루나의 조언</div>
                 {report.advice.map((a, i) => (
                   <div key={i} style={{
-                    fontSize: '11px', color: '#c5a3f5', lineHeight: 2,
+                    fontSize: '13px', color: '#d4b8f0', lineHeight: 2,
                     paddingLeft: 12, borderLeft: '2px solid #6b2d8b', marginBottom: 10,
                   }}>
                     {a}
@@ -128,7 +128,7 @@ export default function ReportPage({ sessionId }) {
             {report.closingWords && (
               <div style={{ textAlign: 'center', color: '#f0e6ff', fontSize: '11px', lineHeight: 2.2, fontStyle: 'italic', marginBottom: 8 }}>
                 "{report.closingWords}"
-                <div style={{ color: '#9b7fc4', fontSize: '10px', marginTop: 8 }}>— Luna</div>
+                <div style={{ color: '#c8a8e8', fontSize: '10px', marginTop: 8 }}>— Luna</div>
               </div>
             )}
           </>

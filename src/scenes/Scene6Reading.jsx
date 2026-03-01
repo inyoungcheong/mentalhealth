@@ -159,7 +159,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
             <div key={i} style={{
               background: 'rgba(107,45,139,0.2)', border: '1px solid #6b2d8b',
               padding: '3px 6px',
-              fontFamily: "'Press Start 2P'", fontSize: '6px', color: '#c5a3f5',
+              fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#d4b8f0',
               textAlign: 'center',
             }}>
               <div style={{ color: '#ffd700' }}>{dc.positionLabel}</div>
@@ -183,7 +183,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
           <div style={{ cursor: 'pointer' }} onClick={handleDrawCard}>
             <TarotCard faceDown={true} size="lg" glowing />
           </div>
-          <div style={{ fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#9b4fc4' }}>
+          <div style={{ fontFamily: "'Press Start 2P'", fontSize: '10px', color: '#e0b8ff' }}>
             카드를 클릭해서 뽑아
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
 
           {loading && (
             <div style={{
-              fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#9b4fc4',
+              fontFamily: "'Press Start 2P'", fontSize: '10px', color: '#e0b8ff',
               textAlign: 'center', lineHeight: 2, maxWidth: 300,
               animation: 'msgFadeIn 0.4s ease',
               key: loadingMsgIdx,
@@ -265,7 +265,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
               <div style={{ fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#ffd700', marginBottom: 3 }}>
                 {positions[currentIdx]}
               </div>
-              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#c5a3f5' }}>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '9px', color: '#d4b8f0' }}>
                 {currentCard.korName} {currentCard.isReversed ? '(역방향)' : ''}
               </div>
             </div>

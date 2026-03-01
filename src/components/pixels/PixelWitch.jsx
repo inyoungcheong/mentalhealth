@@ -1,16 +1,17 @@
 import React from 'react';
 import '../../styles/pixelart.css';
 
+// Pixel art witch - Zelda + Arcana Village style
+// Elegant mystical oracle with deep violet robes, silver hair, glowing amber eyes
 export default function PixelWitch({ x = 300, visible = true, scale = 1.5 }) {
   if (!visible) return null;
-
   return (
     <div style={{
       position: 'absolute',
       bottom: 28,
       left: x,
       imageRendering: 'pixelated',
-      transform: `scale(${scale}) scaleX(-1)`, // facing left (toward child)
+      transform: `scale(${scale}) scaleX(-1)`,
       transformOrigin: 'bottom center',
       animation: 'idle-bob 1.4s ease-in-out infinite',
     }}>
@@ -19,116 +20,167 @@ export default function PixelWitch({ x = 300, visible = true, scale = 1.5 }) {
   );
 }
 
-/* Lospec-style palette: muted purples, gold, skin */
-const PALETTE = {
-  hatDark: '#3a2a5a',
-  hatMid: '#5a4a7a',
-  hatLight: '#6a5a8a',
-  hairDark: '#3a2a5a',
-  hairLight: '#8a7aa8',
-  skin: '#e8d4c8',
-  skinShadow: '#c9b8a8',
-  eyes: '#2a5a4a',
-  pupils: '#1a2a22',
-  nose: '#c9a898',
-  mouth: '#a85a5a',
-  robe: '#5a4a7a',
-  robeBorder: '#4a3a6a',
-  robeSkirt: '#4a3a6a',
-  robeFlare: '#3a2a5a',
-  gold: '#c9a227',
-  cardBg: '#1a1528',
-  shoes: '#2a2a2a',
-  sparkle: '#c9a227',
-  sparkleAlt: '#8a7aa8',
+/* Arcana Village oracle palette: deep violet, silver, warm gold */
+const P = {
+  hatBase:    '#2a1a4a',
+  hatMid:     '#3d2a6a',
+  hatLight:   '#5a3d8a',
+  hatBrim:    '#1a0f30',
+  hatBand:    '#c8a030',
+  hairBase:   '#c8c0d8',
+  hairDark:   '#8a80a0',
+  hairLight:  '#e8e0f0',
+  skin:       '#f0d8c0',
+  skinShadow: '#d4b898',
+  eyes:       '#d4a020',
+  eyeGlow:    '#ffe080',
+  eyePupil:   '#2a1a08',
+  mouth:      '#c07878',
+  robe:       '#3a2060',
+  robeMid:    '#4a2878',
+  robeDark:   '#251540',
+  robeLight:  '#6040a0',
+  trim:       '#c8a030',
+  trimLight:  '#e8c050',
+  sash:       '#8a2040',
+  sashLight:  '#b03060',
+  cloakIn:    '#1a0f30',
+  hands:      '#f0d8c0',
+  staff:      '#7a5a30',
+  staffDark:  '#4a3818',
+  crystal:    '#a060e0',
+  crystalGlow:'#d090ff',
+  shoes:      '#1a1028',
+  shoesTip:   '#2a1a40',
+  spark1:     '#e8c050',
+  spark2:     '#c090f0',
+  spark3:     '#80d0ff',
 };
 
 export function WitchSprite({ style = {} }) {
   return (
-    <div style={{ position: 'relative', width: 24, height: 46, imageRendering: 'pixelated', ...style }}>
-      {/* Hat - wide brim */}
-      <div style={{ position: 'absolute', top: 0, left: 1, width: 22, height: 3, background: PALETTE.hatDark }} />
-      {/* Hat body - tall and pointy */}
-      <div style={{ position: 'absolute', top: 0, left: 8, width: 8, height: 3, background: PALETTE.hatMid }} />
-      <div style={{ position: 'absolute', top: -4, left: 9, width: 6, height: 5, background: PALETTE.hatMid }} />
-      <div style={{ position: 'absolute', top: -8, left: 10, width: 4, height: 5, background: PALETTE.hatLight }} />
-      <div style={{ position: 'absolute', top: -12, left: 11, width: 2, height: 5, background: PALETTE.hatDark }} />
-      {/* Hat star */}
-      <div style={{ position: 'absolute', top: -6, left: 10, width: 4, height: 4, background: PALETTE.gold, clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }} />
+    <div style={{ position: 'relative', width: 28, height: 58, imageRendering: 'pixelated', ...style }}>
 
-      {/* Hair - flowing purple */}
-      <div style={{ position: 'absolute', top: 2, left: 0, width: 4, height: 14, background: PALETTE.hairDark }} />
-      <div style={{ position: 'absolute', top: 2, right: 0, width: 4, height: 14, background: PALETTE.hairDark }} />
-      <div style={{ position: 'absolute', top: 4, left: 1, width: 3, height: 12, background: PALETTE.hairLight }} />
-      <div style={{ position: 'absolute', top: 4, right: 1, width: 3, height: 12, background: PALETTE.hairLight }} />
+      {/* ===== STAFF (behind body) ===== */}
+      <div style={{ position: 'absolute', top: 8, left: -6, width: 3, height: 44, background: P.staff }} />
+      <div style={{ position: 'absolute', top: 8, left: -5, width: 1, height: 44, background: P.staffDark, opacity: 0.5 }} />
+      <div style={{ position: 'absolute', top: 2, left: -9, width: 9, height: 9, background: P.crystal, borderRadius: '50%', boxShadow: `0 0 4px ${P.crystalGlow}` }} />
+      <div style={{ position: 'absolute', top: 3, left: -8, width: 3, height: 3, background: P.crystalGlow, borderRadius: '50%', opacity: 0.7 }} />
 
-      {/* Face */}
-      <div style={{ position: 'absolute', top: 3, left: 5, width: 14, height: 12, background: PALETTE.skin, border: `1px solid ${PALETTE.skinShadow}` }} />
+      {/* ===== HAT ===== */}
+      <div style={{ position: 'absolute', top: 12, left: 0, width: 28, height: 4, background: P.hatBrim }} />
+      <div style={{ position: 'absolute', top: 13, left: 1, width: 26, height: 2, background: P.hatMid }} />
+      <div style={{ position: 'absolute', top: 11, left: 6, width: 16, height: 2, background: P.hatBand }} />
+      <div style={{ position: 'absolute', top: 8, left: 8, width: 12, height: 5, background: P.hatMid }} />
+      <div style={{ position: 'absolute', top: 4, left: 9, width: 10, height: 5, background: P.hatMid }} />
+      <div style={{ position: 'absolute', top: 1, left: 10, width: 8, height: 4, background: P.hatLight }} />
+      <div style={{ position: 'absolute', top: -2, left: 11, width: 6, height: 4, background: P.hatLight }} />
+      <div style={{ position: 'absolute', top: -5, left: 12, width: 4, height: 4, background: P.hatBase }} />
+      <div style={{ position: 'absolute', top: -8, left: 13, width: 2, height: 4, background: P.hatBase }} />
+      <div style={{ position: 'absolute', top: 0, left: 10, width: 5, height: 5, background: P.trimLight,
+        clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }} />
 
-      {/* Eyes - green witch eyes */}
-      <div style={{ position: 'absolute', top: 6, left: 7, width: 3, height: 3, background: PALETTE.eyes }} />
-      <div style={{ position: 'absolute', top: 6, left: 14, width: 3, height: 3, background: PALETTE.eyes }} />
-      {/* Pupils */}
-      <div style={{ position: 'absolute', top: 7, left: 8, width: 1, height: 2, background: PALETTE.pupils }} />
-      <div style={{ position: 'absolute', top: 7, left: 15, width: 1, height: 2, background: PALETTE.pupils }} />
+      {/* ===== HAIR ===== */}
+      <div style={{ position: 'absolute', top: 14, left: 0, width: 5, height: 18, background: P.hairDark }} />
+      <div style={{ position: 'absolute', top: 14, left: 1, width: 4, height: 16, background: P.hairBase }} />
+      <div style={{ position: 'absolute', top: 16, left: 1, width: 2, height: 14, background: P.hairLight, opacity: 0.6 }} />
+      <div style={{ position: 'absolute', top: 14, right: 0, width: 5, height: 16, background: P.hairDark }} />
+      <div style={{ position: 'absolute', top: 14, right: 1, width: 4, height: 14, background: P.hairBase }} />
+      <div style={{ position: 'absolute', top: 15, left: 5, width: 3, height: 5, background: P.hairBase }} />
+      <div style={{ position: 'absolute', top: 15, left: 20, width: 3, height: 4, background: P.hairBase }} />
 
+      {/* ===== FACE ===== */}
+      <div style={{ position: 'absolute', top: 15, left: 5, width: 18, height: 14, background: P.skin }} />
+      <div style={{ position: 'absolute', top: 20, left: 5, width: 3, height: 5, background: P.skinShadow, opacity: 0.4 }} />
+      <div style={{ position: 'absolute', top: 20, left: 20, width: 3, height: 5, background: P.skinShadow, opacity: 0.4 }} />
+      {/* Glowing amber eyes */}
+      <div style={{ position: 'absolute', top: 19, left: 8, width: 4, height: 4, background: P.eyes, boxShadow: `0 0 3px ${P.eyeGlow}` }} />
+      <div style={{ position: 'absolute', top: 19, left: 16, width: 4, height: 4, background: P.eyes, boxShadow: `0 0 3px ${P.eyeGlow}` }} />
+      <div style={{ position: 'absolute', top: 20, left: 9, width: 2, height: 2, background: P.eyePupil }} />
+      <div style={{ position: 'absolute', top: 20, left: 17, width: 2, height: 2, background: P.eyePupil }} />
+      <div style={{ position: 'absolute', top: 19, left: 9, width: 1, height: 1, background: P.eyeGlow, opacity: 0.9 }} />
+      <div style={{ position: 'absolute', top: 19, left: 17, width: 1, height: 1, background: P.eyeGlow, opacity: 0.9 }} />
+      {/* Eyebrows */}
+      <div style={{ position: 'absolute', top: 17, left: 8, width: 5, height: 1, background: P.hairDark }} />
+      <div style={{ position: 'absolute', top: 16, left: 11, width: 2, height: 1, background: P.hairDark }} />
+      <div style={{ position: 'absolute', top: 17, left: 15, width: 5, height: 1, background: P.hairDark }} />
+      <div style={{ position: 'absolute', top: 16, left: 15, width: 2, height: 1, background: P.hairDark }} />
       {/* Nose */}
-      <div style={{ position: 'absolute', top: 9, left: 11, width: 2, height: 2, background: PALETTE.nose }} />
+      <div style={{ position: 'absolute', top: 24, left: 13, width: 2, height: 2, background: P.skinShadow }} />
+      {/* Mouth */}
+      <div style={{ position: 'absolute', top: 27, left: 10, width: 8, height: 2, background: P.mouth }} />
+      <div style={{ position: 'absolute', top: 28, left: 16, width: 3, height: 1, background: P.mouth }} />
 
-      {/* Mouth - smirk */}
-      <div style={{ position: 'absolute', top: 12, left: 8, width: 8, height: 2, background: PALETTE.mouth }} />
-      <div style={{ position: 'absolute', top: 13, left: 14, width: 2, height: 1, background: PALETTE.mouth }} />
+      {/* ===== NECK ===== */}
+      <div style={{ position: 'absolute', top: 29, left: 10, width: 8, height: 4, background: P.skin }} />
 
-      {/* Neck */}
-      <div style={{ position: 'absolute', top: 15, left: 8, width: 8, height: 3, background: PALETTE.skin }} />
+      {/* ===== ROBE COLLAR ===== */}
+      <div style={{ position: 'absolute', top: 30, left: 5, width: 18, height: 5, background: P.robeMid }} />
+      <div style={{ position: 'absolute', top: 30, left: 5, width: 18, height: 2, background: P.trim }} />
+      <div style={{ position: 'absolute', top: 31, left: 12, width: 4, height: 6, background: P.cloakIn,
+        clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} />
 
-      {/* Robe body */}
-      <div style={{ position: 'absolute', top: 18, left: 2, width: 20, height: 14, background: PALETTE.robe, border: `1px solid ${PALETTE.robeBorder}` }} />
-      {/* Robe center decoration */}
-      <div style={{ position: 'absolute', top: 20, left: 11, width: 2, height: 10, background: PALETTE.gold }} />
+      {/* ===== ROBE BODY ===== */}
+      <div style={{ position: 'absolute', top: 33, left: 2, width: 24, height: 16, background: P.robe }} />
+      <div style={{ position: 'absolute', top: 34, left: 4, width: 5, height: 12, background: P.robeLight, opacity: 0.25 }} />
+      <div style={{ position: 'absolute', top: 33, left: 2, width: 3, height: 16, background: P.robeDark }} />
+      <div style={{ position: 'absolute', top: 33, left: 23, width: 3, height: 16, background: P.robeDark }} />
+      <div style={{ position: 'absolute', top: 33, left: 13, width: 2, height: 16, background: P.trim }} />
+      {/* Sash */}
+      <div style={{ position: 'absolute', top: 40, left: 2, width: 24, height: 4, background: P.sash }} />
+      <div style={{ position: 'absolute', top: 41, left: 3, width: 22, height: 2, background: P.sashLight, opacity: 0.5 }} />
+      <div style={{ position: 'absolute', top: 39, left: 11, width: 6, height: 6, background: P.sash, border: `1px solid ${P.sashLight}` }} />
 
-      {/* Sleeves */}
-      <div style={{ position: 'absolute', top: 18, left: 0, width: 3, height: 10, background: PALETTE.robeBorder }} />
-      <div style={{ position: 'absolute', top: 18, right: 0, width: 3, height: 10, background: PALETTE.robeBorder }} />
+      {/* ===== SLEEVES ===== */}
+      <div style={{ position: 'absolute', top: 33, left: -2, width: 7, height: 14, background: P.robeDark }} />
+      <div style={{ position: 'absolute', top: 34, left: -1, width: 5, height: 12, background: P.robe }} />
+      <div style={{ position: 'absolute', top: 45, left: -3, width: 9, height: 2, background: P.trim }} />
+      <div style={{ position: 'absolute', top: 47, left: -1, width: 5, height: 4, background: P.hands }} />
+      <div style={{ position: 'absolute', top: 33, right: -2, width: 7, height: 14, background: P.robeDark }} />
+      <div style={{ position: 'absolute', top: 34, right: -1, width: 5, height: 12, background: P.robe }} />
+      <div style={{ position: 'absolute', top: 45, right: -3, width: 9, height: 2, background: P.trim }} />
+      <div style={{ position: 'absolute', top: 47, right: -1, width: 5, height: 4, background: P.hands }} />
 
-      {/* Hands holding a card */}
-      <div style={{ position: 'absolute', top: 28, left: 0, width: 4, height: 4, background: PALETTE.skin }} />
-      <div style={{ position: 'absolute', top: 28, right: 0, width: 4, height: 4, background: PALETTE.skin }} />
-
-      {/* Mini tarot card in hand */}
+      {/* Mini tarot card */}
       <div style={{
-        position: 'absolute', top: 22, left: -4, width: 8, height: 12,
-        background: PALETTE.cardBg, border: `1px solid ${PALETTE.gold}`,
+        position: 'absolute', top: 40, left: -8, width: 7, height: 10,
+        background: P.cloakIn, border: `1px solid ${P.trim}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '6px',
+        fontSize: '5px',
       }}>
-        <span style={{ color: PALETTE.gold }}>✦</span>
+        <span style={{ color: P.trimLight }}>✦</span>
       </div>
 
-      {/* Skirt flare */}
-      <div style={{ position: 'absolute', top: 32, left: 0, width: 24, height: 10, background: PALETTE.robeSkirt }} />
-      <div style={{ position: 'absolute', top: 36, left: -2, width: 28, height: 6, background: PALETTE.robeFlare }} />
+      {/* ===== ROBE SKIRT ===== */}
+      <div style={{ position: 'absolute', top: 49, left: 0, width: 28, height: 6, background: P.robeMid }} />
+      <div style={{ position: 'absolute', top: 53, left: -2, width: 32, height: 4, background: P.robe }} />
+      <div style={{ position: 'absolute', top: 55, left: -2, width: 32, height: 2, background: P.trim }} />
 
-      {/* Shoes */}
-      <div style={{ position: 'absolute', top: 42, left: 2, width: 8, height: 4, background: PALETTE.shoes }} />
-      <div style={{ position: 'absolute', top: 42, right: 2, width: 8, height: 4, background: PALETTE.shoes }} />
-      {/* Pointy shoe tips */}
-      <div style={{ position: 'absolute', top: 43, left: 0, width: 3, height: 2, background: PALETTE.shoes }} />
-      <div style={{ position: 'absolute', top: 43, right: 0, width: 3, height: 2, background: PALETTE.shoes }} />
+      {/* ===== SHOES ===== */}
+      <div style={{ position: 'absolute', top: 55, left: 2, width: 9, height: 3, background: P.shoes }} />
+      <div style={{ position: 'absolute', top: 56, left: 0, width: 3, height: 2, background: P.shoesTip }} />
+      <div style={{ position: 'absolute', top: 55, right: 2, width: 9, height: 3, background: P.shoes }} />
+      <div style={{ position: 'absolute', top: 56, right: 0, width: 3, height: 2, background: P.shoesTip }} />
 
-      {/* Magic sparkles around witch */}
+      {/* ===== MAGIC SPARKLES ===== */}
       <div style={{
-        position: 'absolute', top: -2, right: 22,
-        width: 6, height: 6,
-        color: PALETTE.sparkle, fontSize: '6px',
-        animation: 'sparkle 1.5s ease-in-out infinite',
+        position: 'absolute', top: 5, right: -4,
+        color: P.spark1, fontSize: '7px',
+        animation: 'sparkle 1.6s ease-in-out infinite',
+        filter: `drop-shadow(0 0 2px ${P.spark1})`,
       }}>✦</div>
       <div style={{
-        position: 'absolute', top: 10, right: 24,
-        width: 4, height: 4,
-        color: PALETTE.sparkleAlt, fontSize: '5px',
-        animation: 'sparkle 2s ease-in-out infinite 0.5s',
+        position: 'absolute', top: 18, right: -8,
+        color: P.spark2, fontSize: '5px',
+        animation: 'sparkle 2.2s ease-in-out infinite 0.4s',
+        filter: `drop-shadow(0 0 2px ${P.spark2})`,
       }}>★</div>
+      <div style={{
+        position: 'absolute', top: 35, right: -6,
+        color: P.spark3, fontSize: '4px',
+        animation: 'sparkle 1.9s ease-in-out infinite 0.8s',
+        filter: `drop-shadow(0 0 2px ${P.spark3})`,
+      }}>◆</div>
     </div>
   );
 }

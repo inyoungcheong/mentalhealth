@@ -107,7 +107,7 @@ export default function DiceRoll({ onComplete }) {
           </div>
         ))}
         {phase === 'rolling' && currentLine < 6 && (
-          <div style={{ fontSize: '8px', color: '#6b2d8b', textAlign: 'center', marginTop: 4 }}>
+          <div style={{ fontSize: '9px', color: '#9060c0', textAlign: 'center', marginTop: 4 }}>
             {currentLine + 1}번째 효...
           </div>
         )}
@@ -116,11 +116,11 @@ export default function DiceRoll({ onComplete }) {
       {/* Result */}
       {result && phase === 'done' && (
         <div style={{
-          fontSize: '8px', textAlign: 'center', color: '#2d1a4e',
+          fontSize: '9px', textAlign: 'center', color: '#2d1a4e',
           padding: '8px', background: '#ede7f6', border: '1px solid #9b4fc4',
           maxWidth: 200,
         }}>
-          <div style={{ color: '#6b2d8b', marginBottom: 4 }}>
+          <div style={{ color: '#7a3a9a', marginBottom: 4, fontSize: '10px' }}>
             {result.hexagram.chinese} {result.hexagram.korName}
           </div>
           <div style={{ fontSize: '7px', lineHeight: 1.8, color: '#444' }}>
@@ -136,7 +136,7 @@ export default function DiceRoll({ onComplete }) {
         </button>
       )}
       {phase === 'rolling' && (
-        <div style={{ fontSize: '8px', color: '#6b2d8b' }}>
+        <div style={{ fontSize: '9px', color: '#9060c0' }}>
           <span className="loading-dot">.</span>
           <span className="loading-dot">.</span>
           <span className="loading-dot">.</span>

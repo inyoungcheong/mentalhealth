@@ -116,8 +116,8 @@ export default function Scene3CardDraw({ question, onNext }) {
           {/* Instruction */}
           <div style={{
             fontFamily: "'Press Start 2P'",
-            fontSize: '8px',
-            color: '#c5a3f5',
+            fontSize: '10px',
+            color: '#d4b8f0',
             textAlign: 'center',
             marginBottom: 16,
             letterSpacing: 1,
@@ -226,9 +226,9 @@ export default function Scene3CardDraw({ question, onNext }) {
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <HexagramDisplay lines={hexLines} />
-              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '9px', color: '#c5a3f5', textAlign: 'center', lineHeight: 1.8, maxWidth: 130 }}>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '11px', color: '#d4b8f0', textAlign: 'center', lineHeight: 1.8, maxWidth: 130 }}>
                 <div style={{ color: '#e8c040', marginBottom: 2 }}>{hexagram.korName}</div>
-                <div style={{ fontSize: '8px', color: 'rgba(197,163,245,0.7)' }}>
+                <div style={{ fontSize: '9px', color: 'rgba(220,190,255,0.9)' }}>
                   {hexagram.description}
                 </div>
               </div>
@@ -368,7 +368,7 @@ function OracleLoadingPhase({ card }) {
       <div style={{ animation: 'readingPulse 1.2s ease infinite' }}>
         <TarotCard card={card} faceDown={false} size="lg" glowing />
       </div>
-      <div style={{ fontFamily: "'Press Start 2P'", fontSize: '10px', color: '#9b4fc4', textAlign: 'center', maxWidth: 280 }}>
+      <div style={{ fontFamily: "'Press Start 2P'", fontSize: '12px', color: '#e0b8ff', textAlign: 'center', maxWidth: 280 }}>
         {ORACLE_LOADING_MSGS[msgIdx]}
       </div>
     </div>

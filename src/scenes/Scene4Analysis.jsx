@@ -119,7 +119,7 @@ export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
                 ⚠ 카카오톡 브라우저에서는<br />구글 로그인이 지원되지 않아
               </div>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#c5a3f5',
+                fontFamily: "'Press Start 2P'", fontSize: '9px', color: '#d4b8f0',
                 textAlign: 'center', lineHeight: 2,
               }}>
                 {isAndroid
@@ -136,7 +136,7 @@ export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
                   : urlCopied ? '✓ 주소 복사됨!' : '📋 주소 복사하기'}
               </button>
               {!isAndroid && urlCopied && (
-                <div style={{ fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#c5a3f5', textAlign: 'center', lineHeight: 2 }}>
+                <div style={{ fontFamily: "'Press Start 2P'", fontSize: '9px', color: '#d4b8f0', textAlign: 'center', lineHeight: 2 }}>
                   Safari 주소창에 붙여넣기 후 이동해줘
                 </div>
               )}
@@ -145,7 +145,7 @@ export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
             /* Normal login */
             <>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#c5a3f5',
+                fontFamily: "'Press Start 2P'", fontSize: '10px', color: '#d4b8f0',
                 textAlign: 'center', lineHeight: 1.8,
               }}>
                 여정을 기록하려면<br />로그인이 필요해

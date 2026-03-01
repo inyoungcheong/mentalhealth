@@ -1,8 +1,8 @@
 import React from 'react';
 
 /**
- * Arcana Valley inspired oracle table - beautiful and sophisticated
- * Warm earth tones with mystical accents
+ * Arcana Village inspired oracle table - Zelda + mystical oracle aesthetic
+ * Deep violet velvet cloth with gold trim, rune ornaments
  */
 export default function OracleTable({ children, style = {} }) {
   return (
@@ -12,71 +12,86 @@ export default function OracleTable({ children, style = {} }) {
         width: '100%',
         maxWidth: 600,
         minHeight: 240,
+        /* Deep violet velvet cloth - Arcana Village oracle table */
         background: `
+          radial-gradient(ellipse at 50% 0%, rgba(140, 80, 220, 0.18) 0%, transparent 55%),
+          radial-gradient(ellipse at 50% 100%, rgba(80, 20, 120, 0.2) 0%, transparent 55%),
           repeating-linear-gradient(
             90deg,
-            #5a4a38 0px,
-            #6b5a48 1px,
-            #5a4a38 2px,
-            #4a3a28 3px
+            #2a1848 0px,
+            #311a50 1px,
+            #2a1848 2px,
+            #221440 3px
           )
         `,
-        border: '4px solid #d4a574',
-        borderRadius: 8,
+        border: '3px solid #c8a030',
+        borderRadius: 10,
         boxShadow: `
-          inset 0 2px 8px rgba(212, 165, 116, 0.15),
-          inset 0 -2px 8px rgba(0, 0, 0, 0.4),
-          0 12px 32px rgba(0, 0, 0, 0.5),
-          0 0 24px rgba(212, 165, 116, 0.1)
+          inset 0 2px 12px rgba(160, 100, 255, 0.1),
+          inset 0 -3px 12px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(200, 160, 48, 0.3),
+          0 14px 40px rgba(0, 0, 0, 0.65),
+          0 0 36px rgba(100, 40, 180, 0.18)
         `,
         padding: '28px 24px',
         imageRendering: 'pixelated',
         ...style,
       }}
     >
-      {/* Decorative top border */}
+      {/* Top shimmer line */}
       <div style={{
         position: 'absolute',
         top: 0, left: 0, right: 0, height: 2,
-        background: 'linear-gradient(90deg, transparent 0%, rgba(212, 165, 116, 0.4) 50%, transparent 100%)',
-        borderRadius: '8px 8px 0 0',
+        background: 'linear-gradient(90deg, transparent 0%, rgba(200, 160, 48, 0.7) 50%, transparent 100%)',
+        borderRadius: '10px 10px 0 0',
         pointerEvents: 'none',
       }} />
-      
-      {/* Corner ornaments */}
+      {/* Bottom shimmer line */}
       <div style={{
         position: 'absolute',
-        top: -4, left: -4,
-        width: 12, height: 12,
-        border: '2px solid #d4a574',
-        borderRadius: '50%',
-        opacity: 0.6,
+        bottom: 0, left: 0, right: 0, height: 1,
+        background: 'linear-gradient(90deg, transparent 0%, rgba(200, 160, 48, 0.3) 50%, transparent 100%)',
+        borderRadius: '0 0 10px 10px',
+        pointerEvents: 'none',
       }} />
+      {/* Inner border glow */}
       <div style={{
         position: 'absolute',
-        top: -4, right: -4,
-        width: 12, height: 12,
-        border: '2px solid #d4a574',
-        borderRadius: '50%',
-        opacity: 0.6,
+        inset: 5,
+        border: '1px solid rgba(160, 100, 255, 0.15)',
+        borderRadius: 6,
+        pointerEvents: 'none',
       }} />
+
+      {/* Corner star ornaments */}
+      {[
+        { top: -6, left: -6 },
+        { top: -6, right: -6 },
+        { bottom: -6, left: -6 },
+        { bottom: -6, right: -6 },
+      ].map((pos, i) => (
+        <div key={i} style={{
+          position: 'absolute', ...pos,
+          width: 14, height: 14,
+          background: '#c8a030',
+          clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
+          opacity: 0.9,
+          filter: 'drop-shadow(0 0 3px rgba(200,160,48,0.5))',
+        }} />
+      ))}
+
+      {/* Side rune marks */}
       <div style={{
-        position: 'absolute',
-        bottom: -4, left: -4,
-        width: 12, height: 12,
-        border: '2px solid #d4a574',
-        borderRadius: '50%',
-        opacity: 0.6,
-      }} />
+        position: 'absolute', top: '50%', left: 9, transform: 'translateY(-50%)',
+        fontSize: '11px', color: 'rgba(200,160,48,0.45)',
+        fontFamily: 'serif', lineHeight: 1, userSelect: 'none',
+      }}>✦</div>
       <div style={{
-        position: 'absolute',
-        bottom: -4, right: -4,
-        width: 12, height: 12,
-        border: '2px solid #d4a574',
-        borderRadius: '50%',
-        opacity: 0.6,
-      }} />
-      
+        position: 'absolute', top: '50%', right: 9, transform: 'translateY(-50%)',
+        fontSize: '11px', color: 'rgba(200,160,48,0.45)',
+        fontFamily: 'serif', lineHeight: 1, userSelect: 'none',
+      }}>✦</div>
+
       {children}
     </div>
   );
@@ -111,13 +126,13 @@ export function CardDeckStack({ onClick, disabled, count = 4, style = {} }) {
             left: i * 3,
             width: 110,
             height: 145,
-            background: `linear-gradient(135deg, #1a1428 0%, #2a1f3d 50%, #1a1428 100%)`,
-            border: '2px solid #d4a574',
+            background: `linear-gradient(135deg, #1a0f30 0%, #2a1848 50%, #1a0f30 100%)`,
+            border: '2px solid #c8a030',
             borderRadius: '4px',
             boxShadow: `
               2px 4px 0 rgba(0, 0, 0, 0.4),
-              inset 0 1px 2px rgba(212, 165, 116, 0.1),
-              0 0 8px rgba(212, 165, 116, 0.15)
+              inset 0 1px 2px rgba(200, 160, 48, 0.12),
+              0 0 8px rgba(200, 160, 48, 0.18)
             `,
             display: 'flex',
             alignItems: 'center',
@@ -126,10 +141,10 @@ export function CardDeckStack({ onClick, disabled, count = 4, style = {} }) {
           }}
         >
           {i === numCards - 1 && (
-            <span style={{ 
-              fontSize: 28, 
-              color: '#d4a574',
-              filter: 'drop-shadow(0 0 4px rgba(212, 165, 116, 0.4))',
+            <span style={{
+              fontSize: 28,
+              color: '#c8a030',
+              filter: 'drop-shadow(0 0 5px rgba(200, 160, 48, 0.5))',
               animation: 'glow-pulse 2s ease-in-out infinite',
             }}>✦</span>
           )}
@@ -144,10 +159,10 @@ export function CardDeckStack({ onClick, disabled, count = 4, style = {} }) {
           fontFamily: "'Outfit', sans-serif",
           fontSize: '14px',
           fontWeight: 600,
-          color: '#c8927a',
+          color: '#e8c060',
           whiteSpace: 'nowrap',
           letterSpacing: '0.05em',
-          textShadow: '0 0 4px rgba(200, 146, 122, 0.3)',
+          textShadow: '0 0 6px rgba(200, 160, 48, 0.4)',
         }}>
           탭해서 뽑기
         </div>

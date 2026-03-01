@@ -59,7 +59,7 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
         width: '100%', height: '100%',
         background: 'linear-gradient(180deg, #0d0020, #1a0a2e)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        gap: 20, fontFamily: "'Press Start 2P'", color: '#c5a3f5',
+        gap: 20, fontFamily: "'Press Start 2P'", color: '#d4b8f0',
       }}>
         <div style={{ fontSize: 48 }}>✦</div>
         <div style={{ fontSize: '13px', lineHeight: 2 }}>
@@ -87,7 +87,7 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
         <div style={{ fontSize: '16px', color: '#ffd700', lineHeight: 1.9 }}>
           {report?.title || '당신의 타로 여정'}
         </div>
-        <div style={{ fontSize: '11px', color: '#9b7fc4', marginTop: 10, lineHeight: 1.8 }}>
+        <div style={{ fontSize: '11px', color: '#c8a8e8', marginTop: 10, lineHeight: 1.8 }}>
           "{question}"
         </div>
       </div>
@@ -134,11 +134,11 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
                   {c.positionLabel} — {c.card?.korName}
                   {c.card?.isReversed && <span style={{ color: '#ff8c8c', marginLeft: 6 }}>(역)</span>}
                 </div>
-                <div style={{ fontSize: '12px', color: '#c5a3f5', lineHeight: 1.9 }}>
+                <div style={{ fontSize: '14px', color: '#d4b8f0', lineHeight: 1.9 }}>
                   {report?.cardSummaries?.[i] || c.reading}
                 </div>
                 {c.userAnswer && (
-                  <div style={{ fontSize: '10px', color: 'rgba(197,163,245,0.5)', marginTop: 6, borderTop: '1px solid rgba(107,45,139,0.3)', paddingTop: 6 }}>
+                  <div style={{ fontSize: '10px', color: 'rgba(220,190,255,0.85)', marginTop: 6, borderTop: '1px solid rgba(107,45,139,0.3)', paddingTop: 6 }}>
                     답변: "{c.userAnswer}"
                   </div>
                 )}
@@ -178,7 +178,7 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
           <div style={{ fontSize: '13px', color: '#f0e6ff', lineHeight: 2 }}>
             "{report.closingWords}"
           </div>
-          <div style={{ fontSize: '11px', color: '#9b7fc4', marginTop: 10 }}>— 루나 (Luna)</div>
+          <div style={{ fontSize: '11px', color: '#c8a8e8', marginTop: 10 }}>— 루나 (Luna)</div>
         </div>
       )}
 
@@ -192,7 +192,7 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
         }}>
           <div style={{ fontSize: '12px', color: '#ffd700' }}>리딩 결과 공유하기</div>
           <div style={{
-            fontSize: '10px', color: '#c5a3f5',
+            fontSize: '12px', color: '#d4b8f0',
             padding: '8px 12px', background: 'rgba(27,10,46,0.8)',
             border: '1px solid #6b2d8b', wordBreak: 'break-all',
             maxWidth: '100%', lineHeight: 1.8,

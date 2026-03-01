@@ -75,13 +75,13 @@ export default function Scene5Spread({ question, coreIssue, onNext }) {
                   }}>
                     {isSelected && <span style={{ color: '#ffd700' }}>▶ </span>}
                     {s.name}
-                    <span style={{ fontSize: '10px', color: '#9b7fc4' }}>({s.cards}장)</span>
+                    <span style={{ fontSize: '10px', color: '#c8a8e8' }}>({s.cards}장)</span>
                   </div>
 
                   {/* Positions */}
                   <div style={{
                     fontFamily: "'Press Start 2P'", fontSize: '9px',
-                    color: 'rgba(197,163,245,0.7)',
+                    color: 'rgba(220,190,255,0.9)',
                     marginBottom: 12, lineHeight: 1.8,
                   }}>
                     {s.positions.join(' · ')}

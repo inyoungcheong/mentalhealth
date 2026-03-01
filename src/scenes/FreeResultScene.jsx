@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import TarotCard from '../components/TarotCard';
 import { BLUR_PLACEHOLDER } from '../data/readingTemplates';
 
@@ -21,6 +21,15 @@ export default function FreeResultScene({
   user,
   onSelectTier,    // ({ tier: '330' | '990' }) => void
 }) {
+  const [previewTimedOut, setPreviewTimedOut] = useState(false);
+
+  // 20초 후에도 deepPreview가 안 오면 폴백 표시
+  useEffect(() => {
+    if (deepPreview) return;
+    const t = setTimeout(() => setPreviewTimedOut(true), 20000);
+    return () => clearTimeout(t);
+  }, [deepPreview]);
+
   if (!freeResult) return null;
 
   const { fortune, summary, bridge, synergy } = freeResult;
@@ -150,13 +159,21 @@ export default function FreeResultScene({
           ✨ AI 심층 리딩 미리보기
         </div>
 
-        {/* 미리보기 내용 (LLM 응답 전: 로딩 애니메이션) */}
+        {/* 미리보기 내용 (LLM 응답 전: 로딩 / 타임아웃) */}
         {!deepPreview ? (
           <div>
-            <div style={{ fontFamily: font, fontSize: 'var(--px-xs)', color: '#9b7fc4', lineHeight: 2, marginBottom: 12 }}>
-              {BLUR_PLACEHOLDER.loading}
-            </div>
-            {blurLines}
+            {previewTimedOut ? (
+              <div style={{ fontFamily: font, fontSize: 'var(--px-xs)', color: '#6b5080', lineHeight: 2 }}>
+                결제 후 전체 리딩을 확인할 수 있어.
+              </div>
+            ) : (
+              <>
+                <div style={{ fontFamily: font, fontSize: 'var(--px-xs)', color: '#9b7fc4', lineHeight: 2, marginBottom: 12 }}>
+                  {BLUR_PLACEHOLDER.loading}
+                </div>
+                {blurLines}
+              </>
+            )}
           </div>
         ) : (
           <div>

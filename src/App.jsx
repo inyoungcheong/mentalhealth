@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
-import { saveInitialReading, saveSpreadSelection } from './services/firestoreService';
-import { initUserIfNeeded } from './services/luaService';
+import { createSession } from './services/firestoreService';
+import { requestTossPayment } from './services/paymentService';
 
 import Scene1Intro from './scenes/Scene1Intro';
 import Scene2Village from './scenes/Scene2Village';
 import Scene3CardDraw from './scenes/Scene3CardDraw';
-import CurrencyIntroScene from './scenes/CurrencyIntroScene';
+import FreeResultScene from './scenes/FreeResultScene';
 import Scene6Reading from './scenes/Scene6Reading';
 import Scene7Report from './scenes/Scene7Report';
 import ReportPage from './scenes/ReportPage';
 import HistoryPage from './scenes/HistoryPage';
 import AdminPage from './scenes/AdminPage';
-import LuaHUD from './components/LuaHUD';
+import PaymentSuccessPage from './scenes/PaymentSuccessPage';
 
 import './styles/global.css';
 import './styles/pixelart.css';
@@ -24,22 +24,26 @@ function getSpecialRoute() {
   if (reportMatch) return { type: 'report', id: reportMatch[1] };
   if (path === '/history') return { type: 'history' };
   if (path === '/admin') return { type: 'admin' };
+  if (path === '/payment/success') return { type: 'payment-success' };
+  if (path === '/payment/fail') return { type: 'payment-fail' };
   return null;
 }
 
 export default function App() {
-  // scene: intro | village | analysis | card-draw | lua-intro | reading | report
+  // scene: intro | village | card-draw | free-result | three-card | report
   const [scene, setScene] = useState('intro');
   const [user, setUser] = useState(null);
   const [sessionId, setSessionId] = useState(null);
-  const [luaBalance, setLuaBalance] = useState(null);
 
   // Session data
   const [question, setQuestion] = useState('');
+  const [categoryId, setCategoryId] = useState('general');
   const [initialCard, setInitialCard] = useState(null);
-  const [interpretation, setInterpretation] = useState('');
-  const [coreIssue, setCoreIssue] = useState('');
-  const [deeperHook, setDeeperHook] = useState('');
+  const [initialHexagram, setInitialHexagram] = useState(null);
+  const [freeResult, setFreeResult] = useState(null);   // 템플릿 리딩 결과
+  const [readingId, setReadingId] = useState(null);     // 심층 리딩 doc ID
+  const [deepPreview, setDeepPreview] = useState(null); // blur preview text
+  const [coreIssue, setCoreIssue] = useState('');       // deepReading에서 추출
   const [spreadInfo, setSpreadInfo] = useState(null);
   const [finalCards, setFinalCards] = useState([]);
 
@@ -48,7 +52,7 @@ export default function App() {
     return unsub;
   }, []);
 
-  // Special routes: /report/:id and /history
+  // Special routes
   const specialRoute = getSpecialRoute();
   if (specialRoute?.type === 'report') {
     return (
@@ -71,6 +75,22 @@ export default function App() {
       </div>
     );
   }
+  if (specialRoute?.type === 'payment-success') {
+    return <PaymentSuccessPage />;
+  }
+  if (specialRoute?.type === 'payment-fail') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0d0020', gap: 20 }}>
+        <div style={{ fontSize: 36 }}>✕</div>
+        <div style={{ fontFamily: "'Press Start 2P'", fontSize: '13px', color: '#ff6b6b', textAlign: 'center', lineHeight: 2 }}>
+          결제가 취소됐어.
+        </div>
+        <a href="/" style={{ fontFamily: "'Press Start 2P'", fontSize: '11px', color: '#ffd700', textDecoration: 'none', border: '1px solid #ffd700', padding: '10px 20px' }}>
+          ↩ 돌아가기
+        </a>
+      </div>
+    );
+  }
 
   // ── Scene handlers ──────────────────────────────────────────────
 
@@ -78,43 +98,78 @@ export default function App() {
     setScene('village');
   }
 
-  async function handleVillageNext(q, loggedInUser) {
+  function handleVillageNext(q, loggedInUser, catId = 'general') {
     setQuestion(q);
+    setCategoryId(catId);
     setUser(loggedInUser);
-    try {
-      const res = await initUserIfNeeded();
-      setLuaBalance(res.data.lua);
-    } catch (err) {
-      console.error('initUser error:', err);
-      setLuaBalance(0);
-    }
-    setScene('card-draw'); // free oracle
+    setScene('card-draw');
   }
 
-  function handleCardDrawNext({ card, answer, coreIssue: issue, deeperHook: hook }) {
+  function handleCardDrawNext({ card, hexagram, freeResult: fr, readingId: rid, deepReadingPromise }) {
     setInitialCard(card);
-    setInterpretation(answer || '');
-    setCoreIssue(issue || '');
-    setDeeperHook(hook || '');
-    setScene('lua-intro'); // spread selection (costs lua)
+    setInitialHexagram(hexagram);
+    setFreeResult(fr);
+    setReadingId(rid || null);
+    setScene('free-result');
+    // Await deep reading in background — update state when it resolves
+    if (deepReadingPromise) {
+      deepReadingPromise.then(r => {
+        if (r) {
+          setDeepPreview(r.preview || null);
+          setCoreIssue(r.coreIssue || '');
+        }
+      });
+    }
   }
 
-  async function handleLuaConsumed({ sessionId: sid, luaAfter, spreadType, spreadName, positions, cardCount }) {
-    setSessionId(sid);
-    setLuaBalance(luaAfter);
-    setSpreadInfo({ spreadType, spreadName, positions, cardCount });
+  const THREE_CARD_SPREAD = {
+    spreadType: 'threeCard',
+    spreadName: '과거·현재·미래',
+    positions: ['과거', '현재', '미래'],
+    cardCount: 3,
+  };
 
-    // Save oracle data to the newly created session
-    if (initialCard) {
-      try {
-        await saveInitialReading(sid, initialCard, null, interpretation, coreIssue);
-        await saveSpreadSelection(sid, spreadType);
-      } catch (err) {
-        console.error('saveInitialReading error:', err);
-      }
+  async function handleSelectTier({ tier }) {
+    if (!user) return; // FreeResultScene shows login warning
+
+    if (tier === '330') {
+      // single_deep: readingId already exists from initFreeTierReading
+      const orderId = `sd-${readingId}-${Date.now()}`;
+      await requestTossPayment({
+        amount: 330,
+        orderId,
+        orderName: '타로 심층 리딩',
+        customerName: user.displayName,
+        context: {
+          productType: 'single_deep',
+          readingId,
+          initialCard,
+          question,
+        },
+      });
+    } else if (tier === '990') {
+      // three_card: create session (paymentStatus: pending) before redirecting
+      const sid = await createSession(user.uid, question, {
+        paymentStatus: 'pending',
+        readingType: 'three_card',
+      });
+      const orderId = `tc-${sid}-${Date.now()}`;
+      await requestTossPayment({
+        amount: 990,
+        orderId,
+        orderName: '쓰리카드 타로 상담',
+        customerName: user.displayName,
+        context: {
+          productType: 'three_card',
+          sessionId: sid,
+          question,
+          coreIssue,
+          initialCard,
+          initialHexagram,
+          ...THREE_CARD_SPREAD,
+        },
+      });
     }
-
-    setScene('reading');
   }
 
   function handleReadingNext({ cards }) {
@@ -122,21 +177,46 @@ export default function App() {
     setScene('report');
   }
 
+  function handleRestart() {
+    setScene('intro');
+    setQuestion('');
+    setCategoryId('general');
+    setInitialCard(null);
+    setInitialHexagram(null);
+    setFreeResult(null);
+    setReadingId(null);
+    setDeepPreview(null);
+    setCoreIssue('');
+    setSessionId(null);
+    setSpreadInfo(null);
+    setFinalCards([]);
+  }
+
   // ── Scene map ────────────────────────────────────────────────────
 
   const sceneComponents = {
     intro: <Scene1Intro onNext={handleIntroNext} />,
     village: <Scene2Village currentUser={user} onNext={handleVillageNext} />,
-    'card-draw': <Scene3CardDraw question={question} onNext={handleCardDrawNext} />,
-    'lua-intro': (
-      <CurrencyIntroScene
+    'card-draw': (
+      <Scene3CardDraw
         question={question}
-        luaBalance={luaBalance ?? 0}
-        deeperHook={deeperHook}
-        onNext={handleLuaConsumed}
+        categoryId={categoryId}
+        user={user}
+        onNext={handleCardDrawNext}
       />
     ),
-    reading: spreadInfo ? (
+    'free-result': (
+      <FreeResultScene
+        card={initialCard}
+        hexagram={initialHexagram}
+        freeResult={freeResult}
+        readingId={readingId}
+        deepPreview={deepPreview}
+        user={user}
+        onSelectTier={handleSelectTier}
+      />
+    ),
+    'three-card': spreadInfo ? (
       <Scene6Reading
         sessionId={sessionId}
         question={question}
@@ -159,14 +239,11 @@ export default function App() {
     ),
   };
 
-  const devScenes = ['intro', 'village', 'card-draw', 'lua-intro', 'reading', 'report'];
+  const devScenes = ['intro', 'village', 'card-draw', 'free-result', 'three-card', 'report'];
 
   return (
     <div className="game-viewport">
       <div className="game-screen" style={{ overflowY: 'auto', position: 'relative' }}>
-
-        {/* Lua balance HUD */}
-        <LuaHUD luaBalance={user ? luaBalance : null} />
 
         {/* Scene transition wrapper */}
         <div

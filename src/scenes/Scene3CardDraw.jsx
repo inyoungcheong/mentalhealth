@@ -1,35 +1,33 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import TarotCard from '../components/TarotCard';
 import ChatBubble from '../components/ChatBubble';
 import OracleTable, { CardDeckStack } from '../components/OracleTable';
 import CoinToss from '../components/CoinToss';
 import { drawRandomCard } from '../data/tarotCards';
-import { oracleReading } from '../services/geminiService';
+import { generateFreeReadingWithInputs } from '../data/freeReading';
+import { initFreeTierReading, generateDeepReading } from '../services/geminiService';
 import { playCardDraw } from '../utils/sound';
 
-// phases: table → (user draws card + rolls coins) → loading → card-reveal → verdict → answer → hook → done
+// phases: table → loading → card-reveal → verdict → answer → done | daily-limit
+const POSITIVE_TIERS = new Set(['great_fortune', 'fortune']);
 
-export default function Scene3CardDraw({ question, onNext }) {
+export default function Scene3CardDraw({ question, categoryId = 'general', user, onNext }) {
   const [phase, setPhase] = useState('table');
   const [card, setCard] = useState(null);
   const [hexagram, setHexagram] = useState(null);
   const [hexLines, setHexLines] = useState([]);
   const [cardDrawn, setCardDrawn] = useState(false);
   const [hexagramDone, setHexagramDone] = useState(false);
-  const [verdict, setVerdict] = useState('');
-  const [verdictText, setVerdictText] = useState('');
-  const [answer, setAnswer] = useState('');
-  const [coreIssue, setCoreIssue] = useState('');
-  const [deeperHook, setDeeperHook] = useState('');
+  const [freeResult, setFreeResult] = useState(null);
+  const [readingId, setReadingId] = useState(null);
+  const [dailyLimitExceeded, setDailyLimitExceeded] = useState(false);
   const [answerDone, setAnswerDone] = useState(false);
-  const [hookDone, setHookDone] = useState(false);
-  const [apiFailed, setApiFailed] = useState(false);
+  const deepReadingPromiseRef = useRef(null);
 
   const handleDrawCard = useCallback(() => {
     if (cardDrawn) return;
     playCardDraw();
-    const drawn = drawRandomCard();
-    setCard(drawn);
+    setCard(drawRandomCard());
     setCardDrawn(true);
   }, [cardDrawn]);
 
@@ -39,41 +37,77 @@ export default function Scene3CardDraw({ question, onNext }) {
     setHexagramDone(true);
   }, []);
 
-  // When both ready, run API
+  // When both card + hexagram ready → run template + server checks
   React.useEffect(() => {
     if (!cardDrawn || !hexagramDone || !card || !hexagram) return;
     setPhase('loading');
 
     (async () => {
-      const [result] = await Promise.all([
-        oracleReading({ card, hexagram, question }).catch((_err) => {
-          setApiFailed(true);
-          return {
-            verdict: '흉',
-            verdictText: '알 수 없어',
-            answer: `${card.korName}이 지금 이 상황의 에너지를 보여주고 있어.`,
-            coreIssue: '이 질문 뒤에 더 깊은 무언가가 있어.',
-            deeperHook: '이 질문 뒤에는 더 큰 이야기가 있어. 나와 함께 들여다볼래?',
-          };
-        }),
-        new Promise(r => setTimeout(r, 1800)),
-      ]);
+      // 1. Template reading (instant, client-side, no LLM)
+      const hexagramResult = { hexagram, lines: hexLines };
+      const fr = generateFreeReadingWithInputs(categoryId, question, card, hexagramResult);
+      setFreeResult(fr);
 
-      setVerdict(result.verdict);
-      setVerdictText(result.verdictText);
-      setAnswer(result.answer);
-      setCoreIssue(result.coreIssue);
-      setDeeperHook(result.deeperHook);
+      // 2. Daily limit check (server-side, requires login)
+      let rid = null;
+      if (user) {
+        try {
+          const res = await initFreeTierReading({
+            categoryId,
+            questionText: question,
+            cardId: card.id,
+            isReversed: card.isReversed,
+            hexagramNumber: hexagram.number,
+          });
+          if (!res.allowed) {
+            setDailyLimitExceeded(true);
+            setPhase('daily-limit');
+            return;
+          }
+          rid = res.readingId;
+          setReadingId(rid);
+        } catch (err) {
+          // Function not yet deployed — proceed without readingId
+          console.warn('[initFreeTierReading] not available:', err.message);
+        }
+      }
+
+      // 3. Fire deep reading in background (non-blocking)
+      if (rid && user) {
+        deepReadingPromiseRef.current = generateDeepReading({
+          readingId: rid,
+          card: { ...card, depth: card.depth || null },
+          hexagram,
+          categoryId,
+          questionText: question,
+        }).catch(err => {
+          console.warn('[generateDeepReading] failed:', err.message);
+          return null;
+        });
+      }
+
+      // 4. Minimum loading display
+      await new Promise(r => setTimeout(r, 1800));
+
       setPhase('card-reveal');
       setTimeout(() => setPhase('verdict'), 1000);
     })();
-  }, [cardDrawn, hexagramDone, card, hexagram, question]);
+  }, [cardDrawn, hexagramDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleProceed() {
-    onNext?.({ card, hexagram, verdict, answer, coreIssue, deeperHook });
+    onNext?.({
+      card,
+      hexagram,
+      freeResult,
+      readingId,
+      deepReadingPromise: deepReadingPromiseRef.current,
+    });
   }
 
-  const isGil = verdict === '길';
+  const isPositive = freeResult ? POSITIVE_TIERS.has(freeResult.fortune.tier) : true;
+  const verdictColor = freeResult
+    ? (isPositive ? '#e8c040' : freeResult.fortune.tier === 'neutral' ? '#c5a3f5' : '#c06060')
+    : '#e8c040';
 
   return (
     <div style={{
@@ -87,7 +121,7 @@ export default function Scene3CardDraw({ question, onNext }) {
       boxSizing: 'border-box',
     }}>
 
-      {/* Subtle stars */}
+      {/* Stars */}
       {[...Array(8)].map((_, i) => (
         <div key={i} style={{
           position: 'absolute',
@@ -110,37 +144,16 @@ export default function Scene3CardDraw({ question, onNext }) {
         </div>
       </div>
 
-      {/* TABLE PHASE: User draws card + rolls coins */}
+      {/* TABLE PHASE */}
       {phase === 'table' && (
         <OracleTable>
-          {/* Instruction */}
-          <div style={{
-            fontFamily: "'Press Start 2P'",
-            fontSize: 'var(--px-xs)',
-            color: '#c5a3f5',
-            textAlign: 'center',
-            marginBottom: 16,
-            letterSpacing: 1,
-          }}>
+          <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#c5a3f5', textAlign: 'center', marginBottom: 16, letterSpacing: 1 }}>
             카드를 뽑고 동전을 6번 던져주세요
           </div>
-
-          {/* Two-column grid — equal width */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1px 1fr',
-            gap: '0 16px',
-            alignItems: 'start',
-            width: '100%',
-          }}>
-            {/* Left: Card deck */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1px 1fr', gap: '0 16px', alignItems: 'start', width: '100%' }}>
+            {/* Card */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-              <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)',
-                color: '#e8c040', letterSpacing: 2,
-                borderBottom: '1px solid rgba(232,192,64,0.3)',
-                paddingBottom: 4, width: '100%', textAlign: 'center',
-              }}>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#e8c040', letterSpacing: 2, borderBottom: '1px solid rgba(232,192,64,0.3)', paddingBottom: 4, width: '100%', textAlign: 'center' }}>
                 타로
               </div>
               {!cardDrawn ? (
@@ -151,44 +164,23 @@ export default function Scene3CardDraw({ question, onNext }) {
                 </div>
               )}
               {cardDrawn && (
-                <div style={{
-                  fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)',
-                  color: '#e8c040', textAlign: 'center', lineHeight: 1.8,
-                }}>
+                <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#e8c040', textAlign: 'center', lineHeight: 1.8 }}>
                   {card.korName}
-                  {card.isReversed && (
-                    <div style={{ fontSize: 'var(--px-2xs)', color: '#c08080', marginTop: 2 }}>역방향</div>
-                  )}
+                  {card.isReversed && <div style={{ fontSize: 'var(--px-2xs)', color: '#c08080', marginTop: 2 }}>역방향</div>}
                 </div>
               )}
             </div>
-
             {/* Divider */}
             <div style={{ background: 'rgba(107,45,139,0.4)', alignSelf: 'stretch' }} />
-
-            {/* Right: Coins */}
+            {/* Coins */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-              <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)',
-                color: '#e8c040', letterSpacing: 2,
-                borderBottom: '1px solid rgba(232,192,64,0.3)',
-                paddingBottom: 4, width: '100%', textAlign: 'center',
-              }}>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#e8c040', letterSpacing: 2, borderBottom: '1px solid rgba(232,192,64,0.3)', paddingBottom: 4, width: '100%', textAlign: 'center' }}>
                 주역
               </div>
-              <CoinToss
-                onComplete={handleHexagramComplete}
-                disabled={hexagramDone}
-              />
+              <CoinToss onComplete={handleHexagramComplete} disabled={hexagramDone} />
             </div>
           </div>
-
-          {/* Done indicators */}
-          <div style={{
-            display: 'flex', justifyContent: 'space-around',
-            marginTop: 14,
-            fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)',
-          }}>
+          <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: 14, fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)' }}>
             <span style={{ color: cardDrawn ? '#5a9e3a' : 'rgba(255,255,255,0.2)' }}>
               {cardDrawn ? '✓ 카드 완료' : '○ 카드 대기'}
             </span>
@@ -199,21 +191,34 @@ export default function Scene3CardDraw({ question, onNext }) {
         </OracleTable>
       )}
 
-      {/* LOADING phase (brief, after both ready) */}
-      {phase === 'loading' && (
+      {/* LOADING */}
+      {phase === 'loading' && card && (
         <OracleTable>
           <OracleLoadingPhase card={card} />
         </OracleTable>
       )}
 
-      {/* CARD-REVEAL + VERDICT + READING */}
-      {phase !== 'table' && phase !== 'loading' && card && hexagram && (
+      {/* DAILY LIMIT EXCEEDED */}
+      {phase === 'daily-limit' && (
+        <div style={{ textAlign: 'center', maxWidth: 380, padding: '20px 0' }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>🌙</div>
+          <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-md)', color: '#c5a3f5', lineHeight: 2, marginBottom: 8 }}>
+            오늘의 무료 리딩을 이미 사용했어.
+          </div>
+          <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#9b7fc4', lineHeight: 2, marginBottom: 24 }}>
+            내일 자정 이후에 다시 만나자.
+          </div>
+          <a href="/" style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#ffd700', textDecoration: 'none', border: '1px solid #ffd700', padding: '10px 20px' }}>
+            ↩ 홈으로
+          </a>
+        </div>
+      )}
+
+      {/* CARD-REVEAL + VERDICT + ANSWER */}
+      {(phase === 'card-reveal' || phase === 'verdict' || phase === 'answer' || phase === 'done') && card && hexagram && freeResult && (
         <>
-          <div style={{
-            display: 'flex', gap: 28, alignItems: 'flex-start',
-            justifyContent: 'center', flexWrap: 'wrap',
-            width: '100%', maxWidth: 560,
-          }}>
+          {/* Card + Hexagram display */}
+          <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start', justifyContent: 'center', flexWrap: 'wrap', width: '100%', maxWidth: 560 }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <div style={{ animation: phase === 'card-reveal' ? 'cardRevealFlip 0.6s ease forwards' : 'none' }}>
                 <TarotCard card={card} faceDown={false} size="lg" glowing />
@@ -223,92 +228,59 @@ export default function Scene3CardDraw({ question, onNext }) {
                 {card.isReversed && <div style={{ fontSize: 'var(--px-xs)', color: '#c08080', marginTop: 2 }}>역방향</div>}
               </div>
             </div>
-
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <HexagramDisplay lines={hexLines} />
               <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#c5a3f5', textAlign: 'center', lineHeight: 1.8, maxWidth: 130 }}>
                 <div style={{ color: '#e8c040', marginBottom: 2 }}>{hexagram.korName}</div>
-                <div style={{ fontSize: 'var(--px-xs)', color: 'rgba(197,163,245,0.7)' }}>
-                  {hexagram.description}
-                </div>
+                <div style={{ fontSize: 'var(--px-xs)', color: 'rgba(197,163,245,0.7)' }}>{hexagram.description}</div>
               </div>
             </div>
           </div>
 
-          {(phase === 'verdict' || phase === 'answer' || phase === 'hook' || phase === 'done') && (
-            <div style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
-              animation: 'verdictAppear 0.6s cubic-bezier(0.34,1.5,0.64,1) forwards',
-            }}>
-              <div style={{
-                fontFamily: "'Press Start 2P'",
-                fontSize: 56,
-                color: isGil ? '#e8c040' : '#c06060',
-                filter: isGil
-                  ? 'drop-shadow(0 0 16px #e8c040) drop-shadow(0 0 32px rgba(232,192,64,0.35))'
-                  : 'drop-shadow(0 0 16px #c06060) drop-shadow(0 0 32px rgba(192,96,96,0.35))',
-                lineHeight: 1,
-              }}>
-                {verdict || '?'}
+          {/* Verdict (fortune label + message) */}
+          {(phase === 'verdict' || phase === 'answer' || phase === 'done') && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, animation: 'verdictAppear 0.6s cubic-bezier(0.34,1.5,0.64,1) forwards' }}>
+              <div style={{ fontSize: 48, lineHeight: 1, filter: `drop-shadow(0 0 16px ${verdictColor})` }}>
+                {freeResult.fortune.emoji}
               </div>
               <div style={{
                 fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)',
-                color: isGil ? '#e8c040' : '#c08080',
-                letterSpacing: 2,
-                border: `2px solid ${isGil ? '#e8c040' : '#c06060'}`,
+                color: verdictColor, letterSpacing: 2,
+                border: `2px solid ${verdictColor}`,
                 padding: '8px 14px',
-                background: isGil ? 'rgba(232,192,64,0.08)' : 'rgba(192,96,96,0.08)',
-                maxWidth: 320,
-                textAlign: 'center',
-                lineHeight: 1.6,
+                background: `rgba(${isPositive ? '232,192,64' : '192,96,96'},0.08)`,
+                maxWidth: 320, textAlign: 'center', lineHeight: 1.6,
               }}>
-                {verdictText}
+                {freeResult.fortune.label}
+              </div>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#c5a3f5', textAlign: 'center', maxWidth: 340, lineHeight: 2, marginTop: 4 }}>
+                {freeResult.fortune.message}
               </div>
               {phase === 'verdict' && <VerdictTimer onDone={() => setPhase('answer')} />}
             </div>
           )}
 
-          {(phase === 'answer' || phase === 'hook' || phase === 'done') && answer && (
+          {/* Card interpretation via ChatBubble */}
+          {(phase === 'answer' || phase === 'done') && (
             <div style={{ width: '100%', maxWidth: 540 }}>
               <ChatBubble
-                key="oracle-answer"
-                text={answer}
+                key="free-answer"
+                text={freeResult.summary.cardSection}
                 speaker="witch"
-                onDone={() => { setAnswerDone(true); setPhase('hook'); }}
+                onDone={() => { setAnswerDone(true); setPhase('done'); }}
               />
             </div>
           )}
 
-          {(phase === 'hook' || phase === 'done') && answerDone && deeperHook && (
-            <div style={{ width: '100%', maxWidth: 540 }}>
-              <ChatBubble
-                key="oracle-hook"
-                text={deeperHook}
-                speaker="witch"
-                onDone={() => { setHookDone(true); setPhase('done'); }}
-              />
-            </div>
-          )}
-
-          {phase === 'done' && hookDone && (
-            <div style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
-              animation: 'verdictAppear 0.5s ease forwards',
-            }}>
-              {apiFailed && (
-                <div style={{
-                  fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#c08080',
-                  textAlign: 'center', marginBottom: 6, lineHeight: 1.6,
-                }}>
-                  ⚠ 점괘 API 연결 실패. 기본 문구가 표시됨.
-                </div>
-              )}
+          {/* Proceed button */}
+          {phase === 'done' && answerDone && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, animation: 'verdictAppear 0.5s ease forwards' }}>
               <button
                 className="pixel-btn gold"
                 onClick={handleProceed}
                 style={{ fontSize: '12px', padding: '12px 24px' }}
               >
-                더 깊이 들어가볼래? ▶
+                결과 전체 보기 ▶
               </button>
             </div>
           )}
@@ -347,10 +319,10 @@ export default function Scene3CardDraw({ question, onNext }) {
   );
 }
 
-const ORACLE_LOADING_MSGS = [
+const LOADING_MSGS = [
   '점을 보는 중...',
   '카드와 괘를 읽고 있어...',
-  '카드를 한 번 유심히 살펴봐봐... 재미있는 디테일이 있을 거야.',
+  '카드를 한 번 유심히 살펴봐봐...',
   '이 순간의 에너지를 감지하고 있어...',
   '질문에 귀 기울이고 있어...',
 ];
@@ -358,9 +330,9 @@ const ORACLE_LOADING_MSGS = [
 function OracleLoadingPhase({ card }) {
   const [msgIdx, setMsgIdx] = React.useState(0);
   React.useEffect(() => {
-    const pickRandom = () => Math.floor(Math.random() * ORACLE_LOADING_MSGS.length);
-    setMsgIdx(pickRandom());
-    const t = setInterval(() => setMsgIdx(pickRandom()), 2000);
+    const pick = () => Math.floor(Math.random() * LOADING_MSGS.length);
+    setMsgIdx(pick());
+    const t = setInterval(() => setMsgIdx(pick()), 2000);
     return () => clearInterval(t);
   }, []);
   return (
@@ -369,7 +341,7 @@ function OracleLoadingPhase({ card }) {
         <TarotCard card={card} faceDown={false} size="lg" glowing />
       </div>
       <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#9b4fc4', textAlign: 'center', maxWidth: 280 }}>
-        {ORACLE_LOADING_MSGS[msgIdx]}
+        {LOADING_MSGS[msgIdx]}
       </div>
     </div>
   );
@@ -385,28 +357,14 @@ function VerdictTimer({ onDone }) {
 
 function HexagramDisplay({ lines }) {
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column-reverse', gap: 4,
-      background: 'rgba(26,10,46,0.5)',
-      border: '1px solid #5a3d6b',
-      padding: '10px 14px',
-      width: 72,
-    }}>
+    <div style={{ display: 'flex', flexDirection: 'column-reverse', gap: 4, background: 'rgba(26,10,46,0.5)', border: '1px solid #5a3d6b', padding: '10px 14px', width: 72 }}>
       {lines.map((line, i) => {
         const isYang = line === 7 || line === 9;
         const isChanging = line === 6 || line === 9;
         return (
-          <div key={i} style={{
-            display: 'flex', gap: 3, alignItems: 'center',
-            animation: `hexLineIn 0.25s ease forwards ${i * 0.1}s`,
-            opacity: 0,
-          }}>
+          <div key={i} style={{ display: 'flex', gap: 3, alignItems: 'center', animation: `hexLineIn 0.25s ease forwards ${i * 0.1}s`, opacity: 0 }}>
             {isYang ? (
-              <div style={{
-                height: 4, flex: 1,
-                background: isChanging ? '#e8c040' : '#9b7bb8',
-                boxShadow: isChanging ? '0 0 4px #e8c040' : 'none',
-              }} />
+              <div style={{ height: 4, flex: 1, background: isChanging ? '#e8c040' : '#9b7bb8', boxShadow: isChanging ? '0 0 4px #e8c040' : 'none' }} />
             ) : (
               <>
                 <div style={{ height: 4, flex: 1, background: isChanging ? '#c08080' : '#5a3d6b' }} />

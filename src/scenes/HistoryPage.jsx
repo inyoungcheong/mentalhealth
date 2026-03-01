@@ -6,9 +6,10 @@ import { getUserSessions, sendMessage, getMyMessages } from '../services/firesto
 const font = "'Press Start 2P', monospace";
 
 const SPREAD_LABELS = {
-  oneCard: '1괘',
+  free_fortune: '무료 점괘',
+  single_deep: '심층 리딩',
+  three_card: '쓰리카드',
   threeCard: '쓰리카드',
-  celticCross: '셀틱 크로스',
 };
 
 function formatDate(ts) {
@@ -251,7 +252,7 @@ export default function HistoryPage({ user }) {
             <textarea
               value={msgContent}
               onChange={e => setMsgContent(e.target.value)}
-              placeholder="루나 관련 문의, 리딩 관련 질문 등 무엇이든..."
+              placeholder="리딩 관련 질문, 결제 문의 등 무엇이든..."
               style={{
                 fontFamily: font, fontSize: 'var(--px-sm)',
                 background: 'rgba(27,10,46,0.8)', border: '1px solid #6b2d8b',

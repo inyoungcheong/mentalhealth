@@ -15,22 +15,22 @@ function callable(name) {
   };
 }
 
-// Step 3: Oracle reading (pre-login) — tarot + I Ching → verdict + direct answer + deeper hook
-// Returns { verdict, verdictText, answer, coreIssue, deeperHook }
-export const oracleReading = callable('oracleReading');
+// Tier 2: 심층 리딩 생성 (1카드 + 주역 → 개인화 해석)
+// Returns { preview, blurredLength, paragraphCount, coreIssue }
+export const generateDeepReading = callable('generateDeepReading');
 
-// Step 4: Identify core issue (fallback, mainly oracle provides coreIssue)
-// Returns { coreIssue: string }
-export const analyzeIssue = callable('analyzeIssue');
+// Tier 1: 무료 리딩 daily limit 확인 + reading doc 생성
+// Returns { allowed: boolean, readingId?: string, reason?: string }
+export const initFreeTierReading = callable('initFreeTierReading');
 
-// Step 5: Recommend a spread (oneCard / threeCard / celticCross only)
-// Returns { spreadType, spreadName, reason, positions, cardCount }
-export const recommendSpread = callable('recommendSpread');
-
-// Step 6: Read a single card in context (buildup — references all previous answers)
-// Returns { reading: string, nextQuestion: string }
+// Tier 3: 쓰리카드 카드별 해석 (buildup)
+// Returns { reading: string, nextQuestion: string, suggestions: string[] }
 export const readCard = callable('readCard');
 
-// Step 7: Generate final report
-// Returns { report: { title, coreMessage, cardSummaries, advice, closingWords } }
+// Tier 3: 쓰리카드 최종 리포트 생성
+// Returns { report: { title, coreMessage, direction, cardSummaries, advice, closingWords } }
 export const generateReport = callable('generateReport');
+
+// 결제 검증 (토스페이먼츠)
+// Returns { success: boolean, productType, readingId }
+export const verifyTossPayment = callable('verifyTossPayment');

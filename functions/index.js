@@ -8,9 +8,8 @@ const db = admin.firestore();
 const { FieldValue } = admin.firestore;
 
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
+const tossSecretKey = defineSecret('TOSS_SECRET_KEY');
 const ADMIN_UID = process.env.ADMIN_UID || '';
-
-const SPREAD_COSTS = { oneCard: 1, threeCard: 3, celticCross: 5 };
 
 const MODEL = 'gemini-2.5-flash';
 
@@ -35,21 +34,6 @@ const WITCH_SYSTEM = `당신은 타로 마녀 아이라(Aira)입니다.
 - 철학 용어는 자연스럽게 녹이되 용어 자체를 설명하지 않는다.
 - 한국어로만 응답.`;
 
-// 점쟁이 — Blunt fortune teller (pre-login oracle)
-const ORACLE_SYSTEM = `당신은 타로와 주역으로 점을 보는 점쟁이입니다.
-직접적이고 단호합니다. 말을 돌리지 않습니다.
-
-역할:
-- 타로 카드와 주역 괘를 종합해 질문에 대한 길(吉)/흉(凶)을 판정한다
-- 반드시 유저의 구체적인 질문에 직접 답한다
-- 질문 속의 더 깊은 문제를 꿰뚫어 본다
-
-말투:
-- 단호하고 직접적. 가능합니다 등 확정적인 결론을 제시.
-- 반말 사용.
-- 과장 없이 사실만. 하지만 깊이 꿰뚫어 보는 눈.
-- 한국어로만 응답.`;
-
 async function callGemini(apiKey, systemInstruction, prompt) {
   const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
@@ -60,127 +44,7 @@ async function callGemini(apiKey, systemInstruction, prompt) {
   return response.text.trim();
 }
 
-// Step 3: 점쟁이 오라클 — 타로 1장 + 주역 1괘 → 길흉 판정 + 직접 답변 + 더 깊은 초대
-// Returns { verdict, verdictText, answer, coreIssue, deeperHook }
-exports.oracleReading = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
-  const { card, hexagram, question } = req.data;
-
-  const cardMeaning = card.isReversed ? card.reversed : card.upright;
-  const cardKeywords = card.keywords ? card.keywords.join(', ') : '';
-
-  const prompt = `
-질문: "${question}"
-
-타로 카드: ${card.korName} (${card.name}) — ${card.isReversed ? '역방향' : '정방향'}
-카드 의미: ${cardMeaning}
-카드 키워드: ${cardKeywords}
-
-주역 괘: ${hexagram.korName} (${hexagram.chinese})
-괘 설명: ${hexagram.description}
-괘 조언: ${hexagram.advice}
-
-이 카드와 괘를 종합해서 점괘를 내려줘.
-
-[길흉 판정]
-"길" 또는 "흉" 중 하나만. 반드시 카드와 괘 모두를 반영해서.
-
-[됩니까/안됩니까]
-질문에 대한 결론을 1~2문장으로 구체적으로. 
-예: "됩니다. 다만 지금은 서두르지 않는 게 좋아.", "안됩니다. 지금은 ~가 더 우선이야.", "가능해. 조금만 인내하면 돼.", "됩니다. 다만 ~한 점을 주의해야 해."
-
-[직접 답변]
-반드시 질문("${question}")에 직접 답할 것. 카드와 괘의 구체적 에너지를 연결해서. 2-3문장. 
-
-[핵심 문제]
-이 질문 뒤에 숨겨진 진짜 고민. 이 사람이 의식하지 못한 더 깊은 역학. 한 문장.
-
-[더 깊이 초대]
-타로 마녀 아이라의 목소리로, 핵심 문제를 포착해서 더 깊은 탐구로 초대하는 말.
-"이 질문 뒤에는..." 같은 방식으로 시작. 반말. 따뜻하지만 꿰뚫는 눈. 2문장.
-
-응답 형식(JSON만, 다른 텍스트 없이):
-{
-  "verdict": "길 또는 흉",
-  "verdictText": "구체적 1~2문장 (예: 됩니다. 다만 서두르지 마라.)",
-  "answer": "직접 답변 2-3문장",
-  "coreIssue": "핵심 문제 한 문장",
-  "deeperHook": "아이라의 초대 2문장"
-}`;
-
-  let parsed = {
-    verdict: '흉',
-    verdictText: '알 수 없어',
-    answer: `${card.korName}과 ${hexagram.korName}이 말하는 건...`,
-    coreIssue: '이 질문 뒤에 더 깊은 무언가가 있어.',
-    deeperHook: '이 질문 뒤에는 더 큰 이야기가 있어. 나와 함께 들여다볼래?',
-  };
-
-  const text = await callGemini(geminiApiKey.value(), ORACLE_SYSTEM, prompt);
-  const match = text.match(/\{[\s\S]*\}/);
-  if (match) {
-    try { parsed = JSON.parse(match[0]); } catch (e) {}
-  }
-  return parsed;
-});
-
-// Step 4: 핵심 문제 분석 (fallback용, 주로 oracle에서 나온 coreIssue 사용)
-exports.analyzeIssue = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
-  const { question, interpretation } = req.data;
-
-  const prompt = `
-질문: "${question}"
-초기 리딩: ${interpretation}
-
-이 사람의 진짜 핵심 문제가 뭔지 한 문장으로 파악해줘.
-형식: "[핵심 문제]가 문제구나." 처럼. 절대 길게 쓰지 말고 핵심만. 50자 이내.`;
-
-  const coreIssue = await callGemini(geminiApiKey.value(), WITCH_SYSTEM, prompt);
-  return { coreIssue };
-});
-
-// Step 5: 스프레드 추천 (쓰리카드 / 켈틱 크로스)
-exports.recommendSpread = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
-  const { question, coreIssue } = req.data;
-
-  const spreads = {
-    threeCard:  { name: '쓰리카드', positions: ['과거', '현재', '미래'], cards: 3 },
-    celticCross: {
-      name: '켈틱 크로스',
-      positions: ['현재 상황', '도전/장애', '근거/기반', '과거', '가능성', '가까운 미래', '당신의 태도', '외부 영향', '희망과 두려움', '결과'],
-      cards: 10,
-    },
-  };
-
-  const prompt = `
-질문: "${question}"
-핵심 문제: "${coreIssue}"
-
-다음 타로 스프레드 중 이 사람의 상황에 가장 적합한 것 하나를 골라줘:
-- threeCard: 상황의 흐름을 파악해야 할 때 (과거/현재/미래, 대부분의 질문에 적합)
-- celticCross: 복잡하게 얽힌 상황을 입체적으로 분석해야 할 때 (깊은 분석 필요)
-
-응답 형식(JSON만): {"spreadType": "threeCard", "reason": "이유 한 문장"}`;
-
-  let parsed = { spreadType: 'threeCard', reason: '상황의 흐름을 명확하게 보기 위해' };
-  const text = await callGemini(geminiApiKey.value(), WITCH_SYSTEM, prompt);
-  const match = text.match(/\{[\s\S]*\}/);
-  if (match) {
-    try { parsed = JSON.parse(match[0]); } catch (e) {}
-  }
-
-  if (!spreads[parsed.spreadType]) parsed.spreadType = 'threeCard';
-
-  const spread = spreads[parsed.spreadType];
-  return {
-    spreadType: parsed.spreadType,
-    spreadName: spread.name,
-    reason: parsed.reason,
-    positions: spread.positions,
-    cardCount: spread.cards,
-  };
-});
-
-// Step 6: 스프레드 카드별 해석 — buildup 방식 (이전 답변 직접 연결)
+// 쓰리카드 스프레드 카드별 해석 — buildup 방식 (이전 답변 직접 연결)
 exports.readCard = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
   const { position, positionLabel, card, previousContext, question, coreIssue, allAnswers } = req.data;
 
@@ -263,7 +127,7 @@ ${reversedNoteStr}${depthStr}${prevCardsStr}${prevAnswersStr}
   return parsed;
 });
 
-// Step 7: 최종 리포트 생성
+// 쓰리카드 최종 리포트 생성
 exports.generateReport = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
   const { question, coreIssue, spreadName, cards, answers } = req.data;
 
@@ -331,62 +195,168 @@ ${answerSummary ? `\n유저와의 대화:\n${answerSummary}` : ''}
   return { report: parsed };
 });
 
-// 루아 시스템 ─ 로그인 후 유저 초기화 (lua=3 신규 지급)
-exports.initUserIfNeeded = onCall({ region: 'asia-northeast3' }, async (req) => {
-  if (!req.auth) throw new Error('Not authenticated');
+// ── Tier 1: 무료 리딩 daily limit + readings doc 생성 ───────────────
+exports.initFreeTierReading = onCall({ region: 'asia-northeast3' }, async (req) => {
+  if (!req.auth) throw new Error('Unauthenticated');
   const uid = req.auth.uid;
-  const userRef = db.collection('users').doc(uid);
-  const userSnap = await userRef.get();
-  if (!userSnap.exists) {
-    await userRef.set({
-      lua: 3,
-      email: req.auth.token.email || '',
-      displayName: req.auth.token.name || '',
-      createdAt: FieldValue.serverTimestamp(),
-    });
-    return { lua: 3, isNew: true };
-  }
-  return { lua: userSnap.data().lua, isNew: false };
+  const { categoryId, questionText, cardId, isReversed, hexagramNumber } = req.data;
+
+  // Daily limit check (query all free_fortune for user, filter by today client-side to avoid composite index)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const snap = await db.collection('readings')
+    .where('userId', '==', uid)
+    .where('type', '==', 'free_fortune')
+    .get();
+  const todayCount = snap.docs.filter(d => {
+    const ts = d.data().createdAt;
+    if (!ts) return false;
+    const date = ts.toDate ? ts.toDate() : new Date(ts.seconds * 1000);
+    return date >= today;
+  }).length;
+  if (todayCount >= 1) return { allowed: false, reason: 'daily_limit' };
+
+  // Create readings doc
+  const ref = await db.collection('readings').add({
+    userId: uid,
+    type: 'free_fortune',
+    categoryId: categoryId || 'general',
+    questionText: questionText || '',
+    cardId: cardId || null,
+    isReversed: !!isReversed,
+    hexagramNumber: hexagramNumber || null,
+    paymentStatus: null,
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  return { allowed: true, readingId: ref.id };
 });
 
-// 루아 차감 + 세션 생성 (Firestore transaction — 서버에서만 결정)
-exports.consumeLuaAndCreateSession = onCall({ region: 'asia-northeast3' }, async (req) => {
-  if (!req.auth) throw new Error('Not authenticated');
+// ── Tier 2: Gemini 심층 리딩 생성 ───────────────────────────────────
+exports.generateDeepReading = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
+  if (!req.auth) throw new Error('Unauthenticated');
   const uid = req.auth.uid;
-  const { spreadType, question } = req.data;
-  const cost = SPREAD_COSTS[spreadType];
-  if (!cost) throw new Error('Invalid spread type');
+  const { readingId, card, hexagram, categoryId, questionText } = req.data;
 
-  const userRef = db.collection('users').doc(uid);
-  const sessionRef = db.collection('sessions').doc();
+  // Security: verify reading belongs to caller
+  const readingDoc = await db.collection('readings').doc(readingId).get();
+  if (!readingDoc.exists || readingDoc.data().userId !== uid) {
+    throw new Error('Unauthorized');
+  }
 
-  return db.runTransaction(async (tx) => {
-    const userSnap = await tx.get(userRef);
-    const lua = userSnap.exists ? userSnap.data().lua : 3;
-    const isNew = !userSnap.exists;
-
-    if (lua < cost) {
-      if (isNew) tx.set(userRef, { lua: 3, createdAt: FieldValue.serverTimestamp() });
-      return { ok: false, reason: 'insufficient-lua', luaAfter: isNew ? 3 : lua, cost };
+  const depthStr = (() => {
+    if (!card.depth) return '';
+    const symbolLine = `카드 상징: ${card.depth.symbol}`;
+    if (card.depth.lenses && card.depth.lenses.length > 0) {
+      const lensLines = card.depth.lenses.map(l => `  - ${l.ref}: ${l.angle}`).join('\n');
+      return `${symbolLine}\n해석 렌즈 (유저 상황에 맞는 하나만 골라 적용, 렌즈 이름 출력 금지):\n${lensLines}\n`;
     }
+    return `${symbolLine}\n`;
+  })();
+  const reversedNoteStr = card.isReversed && card.depth && card.depth.reversedNote
+    ? `역방향 해석 주의: ${card.depth.reversedNote}\n`
+    : '';
 
-    const luaAfter = lua - cost;
-    if (isNew) {
-      tx.set(userRef, { lua: luaAfter, createdAt: FieldValue.serverTimestamp() });
-    } else {
-      tx.update(userRef, { lua: luaAfter });
+  const prompt = `
+질문: "${questionText}"
+카테고리: ${categoryId || 'general'}
+
+카드: ${card.korName} / 방향: ${card.isReversed ? '역방향' : '정방향'}
+카드 의미 (정방향): ${card.upright || ''}
+카드 의미 (역방향): ${card.reversed || ''}
+카드 키워드: ${(card.keywords || []).join(', ')}
+${reversedNoteStr}${depthStr}
+주역 괘: ${hexagram.korName} (제${hexagram.number}괘)
+괘 설명: ${hexagram.description || ''}
+판단: ${hexagram.judgment || ''}
+조언: ${hexagram.advice || ''}
+
+이 카드와 주역 괘의 조합이 드러내는 깊은 메시지를 3-4문단으로 써줘.
+각 문단은 빈 줄로 구분해.
+
+반드시 JSON으로만 응답해:
+{"fullText": "전체 리딩 (3-4문단)", "coreIssue": "이 사람의 핵심 문제를 한 문장으로 (쓰리카드 리딩 컨텍스트로 재사용됨)"}`;
+
+  const text = await callGemini(geminiApiKey.value(), WITCH_SYSTEM, prompt);
+  const match = text.match(/\{[\s\S]*\}/);
+  let fullText = '';
+  let coreIssue = '';
+  if (match) {
+    try {
+      const parsed = JSON.parse(match[0]);
+      fullText = parsed.fullText || '';
+      coreIssue = parsed.coreIssue || '';
+    } catch (e) {
+      fullText = text;
     }
+  } else {
+    fullText = text;
+  }
 
-    tx.set(sessionRef, {
-      userId: uid, question, spreadType, cost,
-      state: 'initial', initialCard: null, hexagram: null,
-      initialInterpretation: null, coreIssue: null,
-      cards: [], answers: [], report: null, isPublic: false,
-      createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
-    });
+  // Preview = first 2 paragraphs
+  const paragraphs = fullText.split(/\n\n+/).filter(p => p.trim());
+  const preview = paragraphs.slice(0, 2).join('\n\n');
 
-    return { ok: true, luaAfter, sessionId: sessionRef.id, cost };
+  // Update reading doc
+  await db.collection('readings').doc(readingId).update({
+    fullText,
+    coreIssue,
+    preview,
+    paymentStatus: 'pending',
   });
+
+  return {
+    preview,
+    coreIssue,
+    blurredLength: fullText.length - preview.length,
+    paragraphCount: paragraphs.length,
+  };
+});
+
+// ── 토스페이먼츠 결제 검증 ────────────────────────────────────────
+exports.verifyTossPayment = onCall({ region: 'asia-northeast3', secrets: [tossSecretKey] }, async (req) => {
+  if (!req.auth) throw new Error('Unauthenticated');
+  const uid = req.auth.uid;
+  const { paymentKey, orderId, amount, readingId, sessionId, productType } = req.data;
+  if (!paymentKey || !orderId || !amount) throw new Error('Missing params');
+
+  // Call Toss Payments confirm API
+  const encoded = Buffer.from(`${tossSecretKey.value()}:`).toString('base64');
+  const tossRes = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${encoded}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ paymentKey, orderId, amount }),
+  });
+  const tossData = await tossRes.json();
+  if (!tossRes.ok) {
+    throw new Error(tossData.message || 'Payment confirmation failed');
+  }
+
+  // Save payment record
+  await db.collection('payments').add({
+    userId: uid,
+    tossPaymentKey: paymentKey,
+    orderId,
+    amount,
+    productType: productType || null,
+    readingId: readingId || null,
+    sessionId: sessionId || null,
+    status: 'completed',
+    tossStatus: tossData.status,
+    createdAt: FieldValue.serverTimestamp(),
+  });
+
+  // Unlock reading or session
+  if (readingId) {
+    await db.collection('readings').doc(readingId).update({ paymentStatus: 'paid', paymentKey });
+  }
+  if (sessionId) {
+    await db.collection('sessions').doc(sessionId).update({ paymentStatus: 'paid', paymentKey });
+  }
+
+  return { success: true, productType, readingId: readingId || null, sessionId: sessionId || null };
 });
 
 // ── 어드민 전용 함수 ──────────────────────────────────────────────
@@ -403,17 +373,6 @@ exports.adminGetUsers = onCall({ region: 'asia-northeast3' }, async (req) => {
   const snap = await db.collection('users').get();
   const users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
   return { users };
-});
-
-// 개별 유저 루나 조정
-exports.adminAdjustLua = onCall({ region: 'asia-northeast3' }, async (req) => {
-  assertAdmin(req);
-  const { targetUid, delta } = req.data;
-  if (!targetUid || typeof delta !== 'number') throw new Error('Invalid params');
-  const userRef = db.collection('users').doc(targetUid);
-  await userRef.update({ lua: FieldValue.increment(delta) });
-  const updated = await userRef.get();
-  return { newBalance: updated.data().lua };
 });
 
 // 특정 유저 세션 목록

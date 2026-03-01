@@ -5,7 +5,7 @@ import {
 import { db } from '../firebase';
 
 // Create a new reading session
-export async function createSession(userId, question) {
+export async function createSession(userId, question, opts = {}) {
   const ref = await addDoc(collection(db, 'sessions'), {
     userId,
     question,
@@ -18,11 +18,20 @@ export async function createSession(userId, question) {
     cards: [],
     answers: [],
     report: null,
+    paymentStatus: opts.paymentStatus || null,
+    readingType: opts.readingType || null,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
     isPublic: false,
   });
   return ref.id;
+}
+
+// Get a readings doc (deep reading content)
+export async function getDeepReading(readingId) {
+  const snap = await getDoc(doc(db, 'readings', readingId));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
 }
 
 // Save initial card + hexagram + interpretation

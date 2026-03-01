@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase';
-import {
-  adminGetUsers,
-  adminAdjustLua,
-  adminGetUserSessions,
-  adminGetMessages,
-  adminReplyMessage,
-} from '../services/luaService';
+import { httpsCallable } from 'firebase/functions';
+import { auth, functions } from '../firebase';
 
 const font = "'Press Start 2P', monospace";
 
-const SPREAD_LABELS = { oneCard: '1괘', threeCard: '쓰리카드', celticCross: '셀틱 크로스' };
+const SPREAD_LABELS = { free_fortune: '무료', single_deep: '심층', three_card: '쓰리카드', threeCard: '쓰리카드' };
 
 function formatDate(ts) {
   if (!ts) return '';
@@ -19,7 +13,6 @@ function formatDate(ts) {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-// Clean underline-style tab button
 function TabBtn({ active, onClick, children }) {
   return (
     <button
@@ -31,7 +24,6 @@ function TabBtn({ active, onClick, children }) {
         color: active ? '#ffd700' : '#6b5080',
         paddingBottom: 8, paddingLeft: 0, paddingRight: 0, marginRight: 28,
         cursor: 'pointer',
-        transition: 'color 0.15s',
       }}
     >
       {children}
@@ -39,7 +31,6 @@ function TabBtn({ active, onClick, children }) {
   );
 }
 
-// Small pill filter button
 function FilterBtn({ active, onClick, children }) {
   return (
     <button
@@ -50,13 +41,30 @@ function FilterBtn({ active, onClick, children }) {
         border: `1px solid ${active ? '#ffd700' : '#3d1a6e'}`,
         color: active ? '#ffd700' : '#6b5080',
         padding: '6px 14px', cursor: 'pointer',
-        transition: 'all 0.15s',
       }}
     >
       {children}
     </button>
   );
 }
+
+// Admin callables (only used here)
+const adminGetUsers = async () => {
+  const fn = httpsCallable(functions, 'adminGetUsers');
+  return fn();
+};
+const adminGetMessages = async () => {
+  const fn = httpsCallable(functions, 'adminGetMessages');
+  return fn();
+};
+const adminGetUserSessions = async (data) => {
+  const fn = httpsCallable(functions, 'adminGetUserSessions');
+  return fn(data);
+};
+const adminReplyMessage = async (data) => {
+  const fn = httpsCallable(functions, 'adminReplyMessage');
+  return fn(data);
+};
 
 export default function AdminPage() {
   const [tab, setTab] = useState('users');
@@ -66,7 +74,6 @@ export default function AdminPage() {
   const [unauthorized, setUnauthorized] = useState(false);
   const [search, setSearch] = useState('');
 
-  const [adjustMap, setAdjustMap] = useState({});
   const [expandedSessions, setExpandedSessions] = useState({});
   const [loadingSessions, setLoadingSessions] = useState({});
 
@@ -93,17 +100,6 @@ export default function AdminPage() {
     }
     load();
   }, []);
-
-  async function handleAdjust(uid, delta) {
-    if (!delta || isNaN(delta)) return;
-    try {
-      const res = await adminAdjustLua({ targetUid: uid, delta: Number(delta) });
-      setUsers(prev => prev.map(u => u.uid === uid ? { ...u, lua: res.data.newBalance } : u));
-      setAdjustMap(prev => ({ ...prev, [uid]: '' }));
-    } catch (e) {
-      alert('루나 조정 실패: ' + e.message);
-    }
-  }
 
   async function toggleSessions(uid) {
     if (expandedSessions[uid]) {
@@ -141,8 +137,7 @@ export default function AdminPage() {
   const containerStyle = {
     maxWidth: 720, margin: '0 auto',
     padding: '36px 28px 100px',
-    fontFamily: font,
-    boxSizing: 'border-box',
+    fontFamily: font, boxSizing: 'border-box',
   };
 
   if (loading) {
@@ -169,14 +164,11 @@ export default function AdminPage() {
   const filteredUsers = users.filter(u => {
     if (!search) return true;
     const s = search.toLowerCase();
-    return (u.email || '').toLowerCase().includes(s) ||
-           (u.displayName || '').toLowerCase().includes(s);
+    return (u.email || '').toLowerCase().includes(s) || (u.displayName || '').toLowerCase().includes(s);
   });
 
   const unansweredCount = messages.filter(m => !m.reply).length;
-  const filteredMessages = msgFilter === 'unanswered'
-    ? messages.filter(m => !m.reply)
-    : messages;
+  const filteredMessages = msgFilter === 'unanswered' ? messages.filter(m => !m.reply) : messages;
 
   return (
     <div style={containerStyle}>
@@ -223,7 +215,6 @@ export default function AdminPage() {
                 border: '1px solid #2a1040',
                 padding: '18px 20px',
               }}>
-                {/* User info row */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
                   <div>
                     <div style={{ fontSize: '13px', color: '#f0e6ff', marginBottom: 5 }}>
@@ -234,46 +225,6 @@ export default function AdminPage() {
                       가입: {formatDate(u.createdAt)}
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '16px', color: '#ffd700' }}>♦ {u.lua ?? '?'}</div>
-                    <div style={{ fontSize: '10px', color: '#7b60a0', marginTop: 3 }}>루나</div>
-                  </div>
-                </div>
-
-                {/* Lua adjustment */}
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <input
-                    type="number"
-                    min="1"
-                    value={adjustMap[u.uid] || ''}
-                    onChange={e => setAdjustMap(prev => ({ ...prev, [u.uid]: e.target.value }))}
-                    placeholder="수량"
-                    style={{
-                      fontFamily: font, fontSize: '11px', width: 80,
-                      background: 'rgba(0,0,0,0.3)', border: '1px solid #3d1a6e',
-                      color: '#f0e6ff', padding: '7px 10px', outline: 'none',
-                    }}
-                  />
-                  <button
-                    onClick={() => handleAdjust(u.uid, Math.abs(Number(adjustMap[u.uid])))}
-                    style={{
-                      fontFamily: font, fontSize: '10px',
-                      background: 'rgba(184,134,11,0.2)', border: '1px solid #b8860b',
-                      color: '#ffd700', padding: '8px 14px', cursor: 'pointer',
-                    }}
-                  >
-                    + 충전
-                  </button>
-                  <button
-                    onClick={() => handleAdjust(u.uid, -Math.abs(Number(adjustMap[u.uid])))}
-                    style={{
-                      fontFamily: font, fontSize: '10px',
-                      background: 'rgba(255,107,107,0.1)', border: '1px solid #7a3030',
-                      color: '#ff9090', padding: '8px 14px', cursor: 'pointer',
-                    }}
-                  >
-                    − 차감
-                  </button>
                   <button
                     onClick={() => toggleSessions(u.uid)}
                     style={{
@@ -303,7 +254,7 @@ export default function AdminPage() {
                         </div>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                           <span style={{ fontSize: '10px', color: '#ffd700' }}>
-                            {SPREAD_LABELS[s.spreadType] || s.spreadType || '?'}
+                            {SPREAD_LABELS[s.spreadType] || s.readingType || s.spreadType || '?'}
                           </span>
                           {s.isPublic && (
                             <a
@@ -351,7 +302,6 @@ export default function AdminPage() {
                 border: `1px solid ${m.reply ? '#2a1040' : '#3d1a6e'}`,
                 padding: '18px 20px',
               }}>
-                {/* Sender */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, flexWrap: 'wrap', gap: 6 }}>
                   <div>
                     <span style={{ fontSize: '12px', color: '#f0e6ff', marginRight: 10 }}>
@@ -362,7 +312,6 @@ export default function AdminPage() {
                   <span style={{ fontSize: '10px', color: '#4a3060' }}>{formatDate(m.createdAt)}</span>
                 </div>
 
-                {/* Content */}
                 <div style={{
                   fontSize: '12px', color: '#c5a3f5', lineHeight: 2,
                   background: 'rgba(0,0,0,0.2)', padding: '10px 12px', marginBottom: 12,
@@ -370,15 +319,12 @@ export default function AdminPage() {
                   {m.content}
                 </div>
 
-                {/* Reply */}
                 {m.reply ? (
                   <div style={{ borderTop: '1px solid #2a1040', paddingTop: 12 }}>
                     <div style={{ fontSize: '10px', color: '#ffd700', marginBottom: 6 }}>
                       ★ 아이라의 답변 ({formatDate(m.repliedAt)})
                     </div>
-                    <div style={{ fontSize: '12px', color: '#f0e6ff', lineHeight: 2 }}>
-                      {m.reply}
-                    </div>
+                    <div style={{ fontSize: '12px', color: '#f0e6ff', lineHeight: 2 }}>{m.reply}</div>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -390,8 +336,7 @@ export default function AdminPage() {
                         fontFamily: font, fontSize: '11px',
                         background: 'rgba(0,0,0,0.3)', border: '1px solid #3d1a6e',
                         color: '#f0e6ff', padding: '10px', resize: 'none', height: 80,
-                        outline: 'none', lineHeight: 1.8, width: '100%',
-                        boxSizing: 'border-box',
+                        outline: 'none', lineHeight: 1.8, width: '100%', boxSizing: 'border-box',
                       }}
                     />
                     <button
@@ -401,9 +346,9 @@ export default function AdminPage() {
                         fontFamily: font, fontSize: '11px',
                         background: 'rgba(184,134,11,0.2)', border: '1px solid #b8860b',
                         color: replyMap[m.id]?.trim() ? '#ffd700' : '#4a3060',
-                        padding: '10px 18px', cursor: replyMap[m.id]?.trim() ? 'pointer' : 'default',
+                        padding: '10px 18px',
+                        cursor: replyMap[m.id]?.trim() ? 'pointer' : 'default',
                         alignSelf: 'flex-start',
-                        transition: 'all 0.15s',
                       }}
                     >
                       {sendingReply[m.id] ? '전송 중...' : '답장 보내기 ▶'}

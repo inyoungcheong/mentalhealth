@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../styles/pixelart.css';
 
-// Pixel art witch - Zelda + Arcana Village style
+// Pixel art witch - Tarot Journey style
 // Elegant mystical oracle with deep violet robes, silver hair, glowing amber eyes
 export default function PixelWitch({ x = 300, visible = true, scale = 1.5 }) {
   if (!visible) return null;

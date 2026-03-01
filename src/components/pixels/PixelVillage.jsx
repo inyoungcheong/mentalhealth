@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Pixel village - Zelda + Arcana Village style
+// Pixel village - Tarot Journey style
 // Warm twilight sky, mystical stone buildings, glowing lanterns, enchanted forest
 
 export default function PixelVillage({ children, style = {} }) {
@@ -13,7 +13,7 @@ export default function PixelVillage({ children, style = {} }) {
       imageRendering: 'pixelated',
       ...style,
     }}>
-      {/* ===== SKY - warm dusk gradient (Zelda twilight feel) ===== */}
+      {/* ===== SKY - warm dusk gradient (Mystical twilight feel) ===== */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: '58%',
         background: 'linear-gradient(180deg, #1a0f3a 0%, #3a1a5a 25%, #6a2a6a 50%, #c85a3a 75%, #e8a050 100%)',

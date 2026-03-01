@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Arcana Village inspired oracle table - Zelda + mystical oracle aesthetic
+ * Tarot Journey inspired oracle table - Mystical oracle aesthetic
  * Deep violet velvet cloth with gold trim, rune ornaments
  */
 export default function OracleTable({ children, style = {} }) {

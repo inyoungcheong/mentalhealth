@@ -13,6 +13,23 @@ const ADMIN_UID = process.env.ADMIN_UID || '';
 
 const MODEL = 'gemini-2.5-flash';
 
+const SPREAD_COSTS = { oneCard: 1, threeCard: 3, celticCross: 5 };
+
+// 점쟁이 — Blunt fortune teller (pre-login oracle, 구 버전 호환용)
+const ORACLE_SYSTEM = `당신은 타로와 주역으로 점을 보는 점쟁이입니다.
+직접적이고 단호합니다. 말을 돌리지 않습니다.
+
+역할:
+- 타로 카드와 주역 괘를 종합해 질문에 대한 길(吉)/흉(凶)을 판정한다
+- 반드시 유저의 구체적인 질문에 직접 답한다
+- 질문 속의 더 깊은 문제를 꿰뚫어 본다
+
+말투:
+- 단호하고 직접적. 가능합니다 등 확정적인 결론을 제시.
+- 반말 사용.
+- 과장 없이 사실만. 하지만 깊이 꿰뚫어 보는 눈.
+- 한국어로만 응답.`;
+
 // Aira — 타로 마녀 (post-login)
 const WITCH_SYSTEM = `당신은 타로 마녀 아이라(Aira)입니다.
 
@@ -359,6 +376,94 @@ exports.verifyTossPayment = onCall({ region: 'asia-northeast3', secrets: [tossSe
   return { success: true, productType, readingId: readingId || null, sessionId: sessionId || null };
 });
 
+// ── 구 버전 호환 함수 (main 브랜치 프론트엔드에서 여전히 호출) ─────────
+
+exports.oracleReading = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
+  const { card, hexagram, question } = req.data;
+  const cardMeaning = card.isReversed ? card.reversed : card.upright;
+  const cardKeywords = card.keywords ? card.keywords.join(', ') : '';
+  const prompt = `
+질문: "${question}"
+타로 카드: ${card.korName} (${card.name}) — ${card.isReversed ? '역방향' : '정방향'}
+카드 의미: ${cardMeaning}
+카드 키워드: ${cardKeywords}
+주역 괘: ${hexagram.korName} (${hexagram.chinese})
+괘 설명: ${hexagram.description}
+괘 조언: ${hexagram.advice}
+이 카드와 괘를 종합해서 점괘를 내려줘.
+[길흉 판정] "길" 또는 "흉" 중 하나만.
+[됩니까/안됩니까] 질문에 대한 결론을 1~2문장으로 구체적으로.
+[직접 답변] 반드시 질문("${question}")에 직접 답할 것. 2-3문장.
+[핵심 문제] 이 질문 뒤에 숨겨진 진짜 고민. 한 문장.
+[더 깊이 초대] 타로 마녀 아이라의 목소리로, 핵심 문제를 포착해서 더 깊은 탐구로 초대하는 말. 반말. 2문장.
+응답 형식(JSON만):
+{"verdict":"길 또는 흉","verdictText":"구체적 1~2문장","answer":"직접 답변 2-3문장","coreIssue":"핵심 문제 한 문장","deeperHook":"아이라의 초대 2문장"}`;
+  let parsed = { verdict: '흉', verdictText: '알 수 없어', answer: `${card.korName}과 ${hexagram.korName}이 말하는 건...`, coreIssue: '이 질문 뒤에 더 깊은 무언가가 있어.', deeperHook: '이 질문 뒤에는 더 큰 이야기가 있어. 나와 함께 들여다볼래?' };
+  const text = await callGemini(geminiApiKey.value(), ORACLE_SYSTEM, prompt);
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) { try { parsed = JSON.parse(match[0]); } catch (e) {} }
+  return parsed;
+});
+
+exports.analyzeIssue = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
+  const { question, interpretation } = req.data;
+  const prompt = `질문: "${question}"\n초기 리딩: ${interpretation}\n이 사람의 진짜 핵심 문제가 뭔지 한 문장으로 파악해줘. 50자 이내.`;
+  const coreIssue = await callGemini(geminiApiKey.value(), WITCH_SYSTEM, prompt);
+  return { coreIssue };
+});
+
+exports.recommendSpread = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
+  const { question, coreIssue } = req.data;
+  const prompt = `질문: "${question}"\n핵심 문제: "${coreIssue}"\n스프레드 선택: threeCard(과거/현재/미래) vs celticCross(10장 깊은 분석)\n응답 형식(JSON만): {"spreadType":"threeCard","reason":"이유 한 문장"}`;
+  const spreads = {
+    threeCard: { name: '쓰리카드', positions: ['과거', '현재', '미래'], cards: 3 },
+    celticCross: { name: '켈틱 크로스', positions: ['현재 상황','도전/장애','근거/기반','과거','가능성','가까운 미래','당신의 태도','외부 영향','희망과 두려움','결과'], cards: 10 },
+  };
+  let parsed = { spreadType: 'threeCard', reason: '상황의 흐름을 명확하게 보기 위해' };
+  const text = await callGemini(geminiApiKey.value(), WITCH_SYSTEM, prompt);
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) { try { parsed = JSON.parse(match[0]); } catch (e) {} }
+  if (!spreads[parsed.spreadType]) parsed.spreadType = 'threeCard';
+  const spread = spreads[parsed.spreadType];
+  return { spreadType: parsed.spreadType, spreadName: spread.name, reason: parsed.reason, positions: spread.positions, cardCount: spread.cards };
+});
+
+exports.initUserIfNeeded = onCall({ region: 'asia-northeast3' }, async (req) => {
+  if (!req.auth) throw new Error('Not authenticated');
+  const uid = req.auth.uid;
+  const userRef = db.collection('users').doc(uid);
+  const userSnap = await userRef.get();
+  if (!userSnap.exists) {
+    await userRef.set({ lua: 3, email: req.auth.token.email || '', displayName: req.auth.token.name || '', createdAt: FieldValue.serverTimestamp() });
+    return { lua: 3, isNew: true };
+  }
+  return { lua: userSnap.data().lua, isNew: false };
+});
+
+exports.consumeLuaAndCreateSession = onCall({ region: 'asia-northeast3' }, async (req) => {
+  if (!req.auth) throw new Error('Not authenticated');
+  const uid = req.auth.uid;
+  const { spreadType, question } = req.data;
+  const cost = SPREAD_COSTS[spreadType];
+  if (!cost) throw new Error('Invalid spread type');
+  const userRef = db.collection('users').doc(uid);
+  const sessionRef = db.collection('sessions').doc();
+  return db.runTransaction(async (tx) => {
+    const userSnap = await tx.get(userRef);
+    const lua = userSnap.exists ? userSnap.data().lua : 3;
+    const isNew = !userSnap.exists;
+    if (lua < cost) {
+      if (isNew) tx.set(userRef, { lua: 3, createdAt: FieldValue.serverTimestamp() });
+      return { ok: false, reason: 'insufficient-lua', luaAfter: isNew ? 3 : lua, cost };
+    }
+    const luaAfter = lua - cost;
+    if (isNew) { tx.set(userRef, { lua: luaAfter, createdAt: FieldValue.serverTimestamp() }); }
+    else { tx.update(userRef, { lua: luaAfter }); }
+    tx.set(sessionRef, { userId: uid, question, spreadType, cost, state: 'initial', initialCard: null, hexagram: null, initialInterpretation: null, coreIssue: null, cards: [], answers: [], report: null, isPublic: false, createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+    return { ok: true, luaAfter, sessionId: sessionRef.id, cost };
+  });
+});
+
 // ── 어드민 전용 함수 ──────────────────────────────────────────────
 
 function assertAdmin(req) {
@@ -366,6 +471,17 @@ function assertAdmin(req) {
     throw new Error('Unauthorized');
   }
 }
+
+// 개별 유저 루나 조정 (구 버전 호환)
+exports.adminAdjustLua = onCall({ region: 'asia-northeast3' }, async (req) => {
+  assertAdmin(req);
+  const { targetUid, delta } = req.data;
+  if (!targetUid || typeof delta !== 'number') throw new Error('Invalid params');
+  const userRef = db.collection('users').doc(targetUid);
+  await userRef.update({ lua: FieldValue.increment(delta) });
+  const updated = await userRef.get();
+  return { newBalance: updated.data().lua };
+});
 
 // 전체 유저 목록
 exports.adminGetUsers = onCall({ region: 'asia-northeast3' }, async (req) => {

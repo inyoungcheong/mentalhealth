@@ -135,7 +135,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
       {/* Header */}
       <div style={{ width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', gap: 4 }}>
         <div style={{
-          fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#ffd700',
+          fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#ffd700',
           display: 'flex', justifyContent: 'space-between',
         }}>
           <span>{spreadName}</span>
@@ -159,7 +159,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
             <div key={i} style={{
               background: 'rgba(107,45,139,0.2)', border: '1px solid #6b2d8b',
               padding: '3px 6px',
-              fontFamily: "'Press Start 2P'", fontSize: '6px', color: '#c5a3f5',
+              fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#c5a3f5',
               textAlign: 'center',
             }}>
               <div style={{ color: '#ffd700' }}>{dc.positionLabel}</div>
@@ -171,7 +171,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
 
       {/* Current position label */}
       <div style={{
-        fontFamily: "'Press Start 2P'", fontSize: '9px',
+        fontFamily: "'Press Start 2P'", fontSize: 'var(--px-md)',
         color: '#c5a3f5', textAlign: 'center',
       }}>
         {positions[currentIdx]} ({currentIdx + 1}/{cardCount})
@@ -183,7 +183,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
           <div style={{ cursor: 'pointer' }} onClick={handleDrawCard}>
             <TarotCard faceDown={true} size="lg" glowing />
           </div>
-          <div style={{ fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#9b4fc4' }}>
+          <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-md)', color: '#9b4fc4' }}>
             카드를 클릭해서 뽑아
           </div>
         </div>
@@ -198,13 +198,13 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
           }}>
             <TarotCard card={currentCard} faceDown={false} size="md" glowing />
           </div>
-          <div style={{ fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#ffd700' }}>
+          <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#ffd700' }}>
             {currentCard.korName} {currentCard.isReversed ? '(역방향)' : ''}
           </div>
 
           {loading && (
             <div style={{
-              fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#9b4fc4',
+              fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#9b4fc4',
               textAlign: 'center', lineHeight: 2, maxWidth: 300,
               animation: 'msgFadeIn 0.4s ease',
               key: loadingMsgIdx,
@@ -237,7 +237,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
                 <button
                   className="pixel-btn gold"
                   onClick={() => setPhase('answering')}
-                  style={{ fontSize: '10px', padding: '10px 22px', marginTop: 4 }}
+                  style={{ fontSize: 'var(--px-sm)', padding: '10px 22px', marginTop: 4 }}
                 >
                   답변하기 ▶
                 </button>
@@ -262,10 +262,10 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
           }}>
             <TarotCard card={currentCard} faceDown={false} size="sm" />
             <div>
-              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#ffd700', marginBottom: 3 }}>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#ffd700', marginBottom: 3 }}>
                 {positions[currentIdx]}
               </div>
-              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#c5a3f5' }}>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#c5a3f5' }}>
                 {currentCard.korName} {currentCard.isReversed ? '(역방향)' : ''}
               </div>
             </div>
@@ -288,7 +288,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
                   onClick={() => setUserAnswer(s)}
                   style={{
                     fontFamily: "'Press Start 2P'",
-                    fontSize: '7px',
+                    fontSize: 'var(--px-sm)',
                     background: userAnswer === s ? 'rgba(155,75,196,0.4)' : 'rgba(107,45,139,0.2)',
                     border: `1px solid ${userAnswer === s ? '#9b4fc4' : '#6b2d8b'}`,
                     color: userAnswer === s ? '#f0e6ff' : '#c5a3f5',
@@ -311,7 +311,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
             placeholder="솔직하게 답해봐..."
             autoFocus
             style={{
-              fontFamily: "'Press Start 2P'", fontSize: '8px',
+              fontFamily: "'Press Start 2P'", fontSize: 'var(--px-md)',
               background: 'rgba(27,10,46,0.8)', border: '1px solid #6b2d8b',
               color: '#f0e6ff', padding: '10px', resize: 'none', height: 80,
               outline: 'none', lineHeight: 1.8, width: '100%',
@@ -323,7 +323,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
             className="pixel-btn gold"
             onClick={handleAnswer}
             disabled={!userAnswer.trim()}
-            style={{ fontSize: '10px' }}
+            style={{ fontSize: 'var(--px-sm)' }}
           >
             {currentIdx + 1 < cardCount ? `▶ 다음 카드로 (${currentIdx + 2}/${cardCount})` : '✓ 리딩 완료'}
           </button>

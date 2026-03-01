@@ -1,30 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
-import { createSession, saveInitialReading, saveSpreadSelection } from './services/firestoreService';
+import { saveInitialReading, saveSpreadSelection } from './services/firestoreService';
+import { initUserIfNeeded } from './services/luaService';
 
 import Scene1Intro from './scenes/Scene1Intro';
 import Scene2Village from './scenes/Scene2Village';
 import Scene3CardDraw from './scenes/Scene3CardDraw';
-import Scene4Analysis from './scenes/Scene4Analysis';
-import Scene5Spread from './scenes/Scene5Spread';
+import CurrencyIntroScene from './scenes/CurrencyIntroScene';
 import Scene6Reading from './scenes/Scene6Reading';
 import Scene7Report from './scenes/Scene7Report';
 import ReportPage from './scenes/ReportPage';
+import HistoryPage from './scenes/HistoryPage';
+import AdminPage from './scenes/AdminPage';
+import LuaHUD from './components/LuaHUD';
 
 import './styles/global.css';
 import './styles/pixelart.css';
 
-// Check if URL is a report share link
-function getReportId() {
-  const match = window.location.pathname.match(/^\/report\/(.+)$/);
-  return match ? match[1] : null;
+function getSpecialRoute() {
+  const path = window.location.pathname;
+  const reportMatch = path.match(/^\/report\/(.+)$/);
+  if (reportMatch) return { type: 'report', id: reportMatch[1] };
+  if (path === '/history') return { type: 'history' };
+  if (path === '/admin') return { type: 'admin' };
+  return null;
 }
 
 export default function App() {
-  const [scene, setScene] = useState('intro'); // intro | village | card-draw | analysis | spread | reading | report
+  // scene: intro | village | analysis | card-draw | lua-intro | reading | report
+  const [scene, setScene] = useState('intro');
   const [user, setUser] = useState(null);
   const [sessionId, setSessionId] = useState(null);
+  const [luaBalance, setLuaBalance] = useState(null);
 
   // Session data
   const [question, setQuestion] = useState('');
@@ -35,82 +43,99 @@ export default function App() {
   const [spreadInfo, setSpreadInfo] = useState(null);
   const [finalCards, setFinalCards] = useState([]);
 
-  // Check auth
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => setUser(u));
     return unsub;
   }, []);
 
-  // Report share page
-  const reportId = getReportId();
-  if (reportId) {
+  // Special routes: /report/:id and /history
+  const specialRoute = getSpecialRoute();
+  if (specialRoute?.type === 'report') {
     return (
-      <div className="game-viewport">
-        <ReportPage sessionId={reportId} />
+      <div style={{ width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden', background: '#0d0020' }}>
+        <ReportPage sessionId={specialRoute.id} />
+      </div>
+    );
+  }
+  if (specialRoute?.type === 'history') {
+    return (
+      <div style={{ width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden', background: '#0d0020' }}>
+        <HistoryPage user={user} />
+      </div>
+    );
+  }
+  if (specialRoute?.type === 'admin') {
+    return (
+      <div style={{ width: '100%', minHeight: '100vh', overflowY: 'auto', overflowX: 'hidden', background: '#0d0020' }}>
+        <AdminPage />
       </div>
     );
   }
 
-  // Scene transitions
-  async function handleIntroNext() {
+  // ── Scene handlers ──────────────────────────────────────────────
+
+  function handleIntroNext() {
     setScene('village');
   }
 
-  async function handleVillageNext(q) {
+  async function handleVillageNext(q, loggedInUser) {
     setQuestion(q);
-    setScene('card-draw');
+    setUser(loggedInUser);
+    try {
+      const res = await initUserIfNeeded();
+      setLuaBalance(res.data.lua);
+    } catch (err) {
+      console.error('initUser error:', err);
+      setLuaBalance(0);
+    }
+    setScene('card-draw'); // free oracle
   }
 
-  async function handleCardDrawNext({ card, answer, coreIssue: issue, deeperHook: hook }) {
+  function handleCardDrawNext({ card, answer, coreIssue: issue, deeperHook: hook }) {
     setInitialCard(card);
     setInterpretation(answer || '');
     setCoreIssue(issue || '');
     setDeeperHook(hook || '');
-    setScene('analysis');
+    setScene('lua-intro'); // spread selection (costs lua)
   }
 
-  async function handleAnalysisNext(loggedInUser) {
-    setUser(loggedInUser);
+  async function handleLuaConsumed({ sessionId: sid, luaAfter, spreadType, spreadName, positions, cardCount }) {
+    setSessionId(sid);
+    setLuaBalance(luaAfter);
+    setSpreadInfo({ spreadType, spreadName, positions, cardCount });
 
-    // Create Firestore session
-    try {
-      const sid = await createSession(loggedInUser.uid, question);
-      setSessionId(sid);
-      if (initialCard) {
-        await saveInitialReading(sid, initialCard, null, interpretation, coreIssue);
-      }
-    } catch (err) {
-      console.error('Firestore session create error:', err);
-    }
-
-    setScene('spread');
-  }
-
-  async function handleSpreadNext(spread) {
-    setSpreadInfo(spread);
-
-    if (sessionId) {
+    // Save oracle data to the newly created session
+    if (initialCard) {
       try {
-        await saveSpreadSelection(sessionId, spread.spreadType);
+        await saveInitialReading(sid, initialCard, null, interpretation, coreIssue);
+        await saveSpreadSelection(sid, spreadType);
       } catch (err) {
-        console.error('Spread save error:', err);
+        console.error('saveInitialReading error:', err);
       }
     }
 
     setScene('reading');
   }
 
-  async function handleReadingNext({ cards }) {
+  function handleReadingNext({ cards }) {
     setFinalCards(cards);
     setScene('report');
   }
 
+  // ── Scene map ────────────────────────────────────────────────────
+
   const sceneComponents = {
     intro: <Scene1Intro onNext={handleIntroNext} />,
-    village: <Scene2Village onNext={handleVillageNext} />,
+    village: <Scene2Village currentUser={user} onNext={handleVillageNext} />,
     'card-draw': <Scene3CardDraw question={question} onNext={handleCardDrawNext} />,
-    analysis: <Scene4Analysis coreIssue={coreIssue} deeperHook={deeperHook} onNext={handleAnalysisNext} />,
-    spread: <Scene5Spread question={question} coreIssue={coreIssue} onNext={handleSpreadNext} />,
+    'lua-intro': (
+      <CurrencyIntroScene
+        question={question}
+        luaBalance={luaBalance ?? 0}
+        deeperHook={deeperHook}
+        onNext={handleLuaConsumed}
+      />
+    ),
     reading: spreadInfo ? (
       <Scene6Reading
         sessionId={sessionId}
@@ -134,30 +159,31 @@ export default function App() {
     ),
   };
 
+  const devScenes = ['intro', 'village', 'card-draw', 'lua-intro', 'reading', 'report'];
+
   return (
     <div className="game-viewport">
-      <div className="game-screen" style={{
-        overflowY: 'auto', position: 'relative',
-      }}>
+      <div className="game-screen" style={{ overflowY: 'auto', position: 'relative' }}>
+
+        {/* Lua balance HUD */}
+        <LuaHUD luaBalance={user ? luaBalance : null} />
+
         {/* Scene transition wrapper */}
         <div
           key={scene}
-          style={{
-            width: '100%', minHeight: '100%',
-            animation: 'sceneFadeIn 0.4s ease',
-          }}
+          style={{ width: '100%', height: '100%', animation: 'sceneFadeIn 0.4s ease' }}
         >
           {sceneComponents[scene] || sceneComponents.intro}
         </div>
 
-        {/* Dev scene skip (remove for production) */}
+        {/* Dev scene skip */}
         {process.env.NODE_ENV === 'development' && (
           <div style={{
             position: 'fixed', bottom: 4, right: 4,
             display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end',
             zIndex: 9999,
           }}>
-            {['intro','village','card-draw','analysis','spread','reading','report'].map(s => (
+            {devScenes.map(s => (
               <button
                 key={s}
                 onClick={() => setScene(s)}

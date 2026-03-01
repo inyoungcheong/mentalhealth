@@ -102,10 +102,10 @@ export default function Scene3CardDraw({ question, onNext }) {
 
       {/* Title */}
       <div style={{ textAlign: 'center', marginBottom: 4 }}>
-        <div style={{ fontSize: '9px', color: 'rgba(197,163,245,0.5)', fontFamily: "'Press Start 2P'", letterSpacing: 3, marginBottom: 4 }}>
+        <div style={{ fontSize: 'var(--px-sm)', color: 'rgba(197,163,245,0.5)', fontFamily: "'Press Start 2P'", letterSpacing: 3, marginBottom: 4 }}>
           ✦ 오늘의 점괘 ✦
         </div>
-        <div style={{ fontSize: '10px', color: 'rgba(180,140,220,0.85)', fontFamily: "'Press Start 2P'", lineHeight: 1.8 }}>
+        <div style={{ fontSize: 'var(--px-md)', color: 'rgba(180,140,220,0.85)', fontFamily: "'Press Start 2P'", lineHeight: 1.8 }}>
           "{question}"
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function Scene3CardDraw({ question, onNext }) {
           {/* Instruction */}
           <div style={{
             fontFamily: "'Press Start 2P'",
-            fontSize: '8px',
+            fontSize: 'var(--px-xs)',
             color: '#c5a3f5',
             textAlign: 'center',
             marginBottom: 16,
@@ -136,7 +136,7 @@ export default function Scene3CardDraw({ question, onNext }) {
             {/* Left: Card deck */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '7px',
+                fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)',
                 color: '#e8c040', letterSpacing: 2,
                 borderBottom: '1px solid rgba(232,192,64,0.3)',
                 paddingBottom: 4, width: '100%', textAlign: 'center',
@@ -152,12 +152,12 @@ export default function Scene3CardDraw({ question, onNext }) {
               )}
               {cardDrawn && (
                 <div style={{
-                  fontFamily: "'Press Start 2P'", fontSize: '7px',
+                  fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)',
                   color: '#e8c040', textAlign: 'center', lineHeight: 1.8,
                 }}>
                   {card.korName}
                   {card.isReversed && (
-                    <div style={{ fontSize: '6px', color: '#c08080', marginTop: 2 }}>역방향</div>
+                    <div style={{ fontSize: 'var(--px-2xs)', color: '#c08080', marginTop: 2 }}>역방향</div>
                   )}
                 </div>
               )}
@@ -169,7 +169,7 @@ export default function Scene3CardDraw({ question, onNext }) {
             {/* Right: Coins */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '7px',
+                fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)',
                 color: '#e8c040', letterSpacing: 2,
                 borderBottom: '1px solid rgba(232,192,64,0.3)',
                 paddingBottom: 4, width: '100%', textAlign: 'center',
@@ -187,7 +187,7 @@ export default function Scene3CardDraw({ question, onNext }) {
           <div style={{
             display: 'flex', justifyContent: 'space-around',
             marginTop: 14,
-            fontFamily: "'Press Start 2P'", fontSize: '7px',
+            fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)',
           }}>
             <span style={{ color: cardDrawn ? '#5a9e3a' : 'rgba(255,255,255,0.2)' }}>
               {cardDrawn ? '✓ 카드 완료' : '○ 카드 대기'}
@@ -218,17 +218,17 @@ export default function Scene3CardDraw({ question, onNext }) {
               <div style={{ animation: phase === 'card-reveal' ? 'cardRevealFlip 0.6s ease forwards' : 'none' }}>
                 <TarotCard card={card} faceDown={false} size="lg" glowing />
               </div>
-              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '9px', color: '#e8c040', textAlign: 'center' }}>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#e8c040', textAlign: 'center' }}>
                 {card.korName}
-                {card.isReversed && <div style={{ fontSize: '8px', color: '#c08080', marginTop: 2 }}>역방향</div>}
+                {card.isReversed && <div style={{ fontSize: 'var(--px-xs)', color: '#c08080', marginTop: 2 }}>역방향</div>}
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <HexagramDisplay lines={hexLines} />
-              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '9px', color: '#c5a3f5', textAlign: 'center', lineHeight: 1.8, maxWidth: 130 }}>
+              <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#c5a3f5', textAlign: 'center', lineHeight: 1.8, maxWidth: 130 }}>
                 <div style={{ color: '#e8c040', marginBottom: 2 }}>{hexagram.korName}</div>
-                <div style={{ fontSize: '8px', color: 'rgba(197,163,245,0.7)' }}>
+                <div style={{ fontSize: 'var(--px-xs)', color: 'rgba(197,163,245,0.7)' }}>
                   {hexagram.description}
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function Scene3CardDraw({ question, onNext }) {
                 {verdict || '?'}
               </div>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '10px',
+                fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)',
                 color: isGil ? '#e8c040' : '#c08080',
                 letterSpacing: 2,
                 border: `2px solid ${isGil ? '#e8c040' : '#c06060'}`,
@@ -297,7 +297,7 @@ export default function Scene3CardDraw({ question, onNext }) {
             }}>
               {apiFailed && (
                 <div style={{
-                  fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#c08080',
+                  fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#c08080',
                   textAlign: 'center', marginBottom: 6, lineHeight: 1.6,
                 }}>
                   ⚠ 점괘 API 연결 실패. 기본 문구가 표시됨.
@@ -368,7 +368,7 @@ function OracleLoadingPhase({ card }) {
       <div style={{ animation: 'readingPulse 1.2s ease infinite' }}>
         <TarotCard card={card} faceDown={false} size="lg" glowing />
       </div>
-      <div style={{ fontFamily: "'Press Start 2P'", fontSize: '10px', color: '#9b4fc4', textAlign: 'center', maxWidth: 280 }}>
+      <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)', color: '#9b4fc4', textAlign: 'center', maxWidth: 280 }}>
         {ORACLE_LOADING_MSGS[msgIdx]}
       </div>
     </div>

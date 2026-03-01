@@ -14,19 +14,23 @@ export default function Scene1Intro({ onNext }) {
 
   return (
     <div style={{
-      width: '100%', height: '100%',
+      width: '100%', minHeight: '100%',
       background: '#ffffff',
       display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
+      alignItems: 'center',
+      paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)',
+      paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
       position: 'relative',
+      overflow: 'visible',
       opacity: phase === 'fade-in' ? 0 : 1,
       transition: 'opacity 0.8s ease',
     }}>
       {/* Title */}
       <div style={{
-        position: 'absolute', top: 60,
+        flexShrink: 0,
+        paddingTop: 24,
         fontFamily: "'Press Start 2P', monospace",
-        fontSize: '14px',
+        fontSize: 'var(--px-lg)',
         color: '#1a0a2e',
         letterSpacing: 2,
         opacity: phase === 'text' || phase === 'done' ? 1 : 0,
@@ -37,49 +41,58 @@ export default function Scene1Intro({ onNext }) {
         <div style={{ color: '#6b2d8b', marginTop: 8 }}>JOURNEY</div>
       </div>
 
-      {/* Subtitle */}
+      {/* Pixel child character - flex center, always visible */}
       <div style={{
-        position: 'absolute', top: 110,
-        fontFamily: "'Press Start 2P', monospace",
-        fontSize: '7px',
-        color: '#888',
-        opacity: phase === 'done' ? 1 : 0,
-        transition: 'opacity 0.6s ease',
+        flex: 1,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: 140,
+        padding: '20px 0',
       }}>
-        당신의 이야기를 찾아서
-      </div>
-
-      {/* Pixel child character - center */}
-      <div style={{
-        opacity: phase === 'appear' || phase === 'text' || phase === 'done' ? 1 : 0,
-        transform: phase === 'appear' || phase === 'text' || phase === 'done'
-          ? 'scale(1) translateY(0)' : 'scale(0.5) translateY(30px)',
-        transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-        imageRendering: 'pixelated',
-      }}>
-        <div style={{ transform: 'scale(3)', transformOrigin: 'bottom center' }}>
-          <ChildSprite />
+        <div style={{
+          opacity: phase === 'appear' || phase === 'text' || phase === 'done' ? 1 : 0,
+          transform: phase === 'appear' || phase === 'text' || phase === 'done'
+            ? 'scale(1) translateY(0)' : 'scale(0.5) translateY(30px)',
+          transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          imageRendering: 'pixelated',
+        }}>
+          <div style={{ transform: 'scale(2.5)', transformOrigin: 'bottom center' }}>
+            <ChildSprite />
+          </div>
         </div>
       </div>
 
       {/* Sparkles */}
       {(phase === 'text' || phase === 'done') && (
         <>
-          <div style={{ position: 'absolute', top: '35%', left: '30%', fontSize: 16, color: '#ffd700', animation: 'sparkle 1.5s infinite' }}>✦</div>
-          <div style={{ position: 'absolute', top: '40%', right: '28%', fontSize: 12, color: '#c084fc', animation: 'sparkle 2s infinite 0.5s' }}>★</div>
-          <div style={{ position: 'absolute', top: '55%', left: '22%', fontSize: 10, color: '#ffd700', animation: 'sparkle 1.8s infinite 0.3s' }}>✦</div>
+          <div style={{ position: 'absolute', top: '38%', left: '28%', fontSize: 16, color: '#ffd700', animation: 'sparkle 1.5s infinite', pointerEvents: 'none' }}>✦</div>
+          <div style={{ position: 'absolute', top: '42%', right: '26%', fontSize: 12, color: '#c084fc', animation: 'sparkle 2s infinite 0.5s', pointerEvents: 'none' }}>★</div>
+          <div style={{ position: 'absolute', top: '58%', left: '20%', fontSize: 10, color: '#ffd700', animation: 'sparkle 1.8s infinite 0.3s', pointerEvents: 'none' }}>✦</div>
         </>
       )}
 
-      {/* Loading dots */}
+      {/* Subtitle + Loading dots */}
       <div style={{
-        position: 'absolute', bottom: 40,
-        fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#aaa',
-        opacity: phase === 'done' ? 1 : 0, transition: 'opacity 0.4s',
+        flexShrink: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24,
+        paddingBottom: 40,
       }}>
-        <span className="loading-dot">.</span>
-        <span className="loading-dot">.</span>
-        <span className="loading-dot">.</span>
+        <div style={{
+          fontFamily: "'Press Start 2P', monospace",
+          fontSize: 'var(--px-xs)',
+          color: '#888',
+          opacity: phase === 'done' ? 1 : 0,
+          transition: 'opacity 0.6s ease',
+        }}>
+          당신의 이야기를 찾아서
+        </div>
+        <div style={{
+          fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#aaa',
+          opacity: phase === 'done' ? 1 : 0, transition: 'opacity 0.4s',
+        }}>
+          <span className="loading-dot">.</span>
+          <span className="loading-dot">.</span>
+          <span className="loading-dot">.</span>
+        </div>
       </div>
 
       <style>{`

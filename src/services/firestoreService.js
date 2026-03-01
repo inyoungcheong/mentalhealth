@@ -1,5 +1,6 @@
 import {
-  collection, doc, addDoc, updateDoc, getDoc, serverTimestamp, arrayUnion
+  collection, doc, addDoc, updateDoc, getDoc, getDocs,
+  serverTimestamp, arrayUnion, query, where, orderBy, limit,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -94,4 +95,42 @@ export async function getSession(sessionId) {
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
   return { id: snap.id, ...snap.data() };
+}
+
+// 유저 → 어드민 문의 보내기
+export async function sendMessage(user, content) {
+  await addDoc(collection(db, 'messages'), {
+    userId: user.uid,
+    userEmail: user.email || '',
+    userDisplayName: user.displayName || '',
+    content,
+    reply: null,
+    repliedAt: null,
+    isReadByAdmin: false,
+    createdAt: serverTimestamp(),
+  });
+}
+
+// 유저 본인의 문의 목록
+export async function getMyMessages(uid) {
+  const q = query(
+    collection(db, 'messages'),
+    where('userId', '==', uid),
+    orderBy('createdAt', 'desc'),
+    limit(20)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+// Get user's past sessions for history page (requires composite index)
+export async function getUserSessions(uid) {
+  const q = query(
+    collection(db, 'sessions'),
+    where('userId', '==', uid),
+    orderBy('createdAt', 'desc'),
+    limit(30)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }

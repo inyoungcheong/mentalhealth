@@ -1,13 +1,21 @@
 const { onCall } = require('firebase-functions/v2/https');
 const { GoogleGenAI } = require('@google/genai');
 const { defineSecret } = require('firebase-functions/params');
+const admin = require('firebase-admin');
+
+admin.initializeApp();
+const db = admin.firestore();
+const { FieldValue } = admin.firestore;
 
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
+const ADMIN_UID = process.env.ADMIN_UID || '';
+
+const SPREAD_COSTS = { oneCard: 1, threeCard: 3, celticCross: 5 };
 
 const MODEL = 'gemini-2.5-flash';
 
-// Luna — 타로 마녀 (post-login)
-const WITCH_SYSTEM = `당신은 타로 마녀 루나(Luna)입니다.
+// Aira — 타로 마녀 (post-login)
+const WITCH_SYSTEM = `당신은 타로 마녀 아이라(Aira)입니다.
 
 핵심 철학:
 - 타로는 현재 상황의 무의식적 패턴과 역학을 드러낸다.
@@ -37,7 +45,7 @@ const ORACLE_SYSTEM = `당신은 타로와 주역으로 점을 보는 점쟁이�
 - 질문 속의 더 깊은 문제를 꿰뚫어 본다
 
 말투:
-- 단호하고 직접적. "됩니다", "안됩니다", "됩니다만" 같은 확언 사용.
+- 단호하고 직접적. 가능합니다 등 확정적인 결론을 제시.
 - 반말 사용.
 - 과장 없이 사실만. 하지만 깊이 꿰뚫어 보는 눈.
 - 한국어로만 응답.`;
@@ -87,7 +95,7 @@ exports.oracleReading = onCall({ region: 'asia-northeast3', secrets: [geminiApiK
 이 질문 뒤에 숨겨진 진짜 고민. 이 사람이 의식하지 못한 더 깊은 역학. 한 문장.
 
 [더 깊이 초대]
-타로 마녀 루나의 목소리로, 핵심 문제를 포착해서 더 깊은 탐구로 초대하는 말.
+타로 마녀 아이라의 목소리로, 핵심 문제를 포착해서 더 깊은 탐구로 초대하는 말.
 "이 질문 뒤에는..." 같은 방식으로 시작. 반말. 따뜻하지만 꿰뚫는 눈. 2문장.
 
 응답 형식(JSON만, 다른 텍스트 없이):
@@ -96,7 +104,7 @@ exports.oracleReading = onCall({ region: 'asia-northeast3', secrets: [geminiApiK
   "verdictText": "구체적 1~2문장 (예: 됩니다. 다만 서두르지 마라.)",
   "answer": "직접 답변 2-3문장",
   "coreIssue": "핵심 문제 한 문장",
-  "deeperHook": "루나의 초대 2문장"
+  "deeperHook": "아이라의 초대 2문장"
 }`;
 
   let parsed = {
@@ -304,7 +312,7 @@ ${answerSummary ? `\n유저와의 대화:\n${answerSummary}` : ''}
     "장기적 미래를 유저가 원하는 방향으로 끌고 가기 위한 조언.",
     "이 과정에서 카드의 에너지를 고려할 때 유저가 특히 주의해야 할 사항."
   ],
-  "closingWords": "루나 톤. 이번 리딩에서 가장 인상적인 카드 하나를 언급하며 마무리. 2문장."
+  "closingWords": "아이라 톤. 이번 리딩에서 가장 인상적인 카드 하나를 언급하며 마무리. 2문장."
 }`;
 
   let parsed = {
@@ -321,4 +329,126 @@ ${answerSummary ? `\n유저와의 대화:\n${answerSummary}` : ''}
     try { parsed = JSON.parse(match[0]); } catch (e) {}
   }
   return { report: parsed };
+});
+
+// 루아 시스템 ─ 로그인 후 유저 초기화 (lua=3 신규 지급)
+exports.initUserIfNeeded = onCall({ region: 'asia-northeast3' }, async (req) => {
+  if (!req.auth) throw new Error('Not authenticated');
+  const uid = req.auth.uid;
+  const userRef = db.collection('users').doc(uid);
+  const userSnap = await userRef.get();
+  if (!userSnap.exists) {
+    await userRef.set({
+      lua: 3,
+      email: req.auth.token.email || '',
+      displayName: req.auth.token.name || '',
+      createdAt: FieldValue.serverTimestamp(),
+    });
+    return { lua: 3, isNew: true };
+  }
+  return { lua: userSnap.data().lua, isNew: false };
+});
+
+// 루아 차감 + 세션 생성 (Firestore transaction — 서버에서만 결정)
+exports.consumeLuaAndCreateSession = onCall({ region: 'asia-northeast3' }, async (req) => {
+  if (!req.auth) throw new Error('Not authenticated');
+  const uid = req.auth.uid;
+  const { spreadType, question } = req.data;
+  const cost = SPREAD_COSTS[spreadType];
+  if (!cost) throw new Error('Invalid spread type');
+
+  const userRef = db.collection('users').doc(uid);
+  const sessionRef = db.collection('sessions').doc();
+
+  return db.runTransaction(async (tx) => {
+    const userSnap = await tx.get(userRef);
+    const lua = userSnap.exists ? userSnap.data().lua : 3;
+    const isNew = !userSnap.exists;
+
+    if (lua < cost) {
+      if (isNew) tx.set(userRef, { lua: 3, createdAt: FieldValue.serverTimestamp() });
+      return { ok: false, reason: 'insufficient-lua', luaAfter: isNew ? 3 : lua, cost };
+    }
+
+    const luaAfter = lua - cost;
+    if (isNew) {
+      tx.set(userRef, { lua: luaAfter, createdAt: FieldValue.serverTimestamp() });
+    } else {
+      tx.update(userRef, { lua: luaAfter });
+    }
+
+    tx.set(sessionRef, {
+      userId: uid, question, spreadType, cost,
+      state: 'initial', initialCard: null, hexagram: null,
+      initialInterpretation: null, coreIssue: null,
+      cards: [], answers: [], report: null, isPublic: false,
+      createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    return { ok: true, luaAfter, sessionId: sessionRef.id, cost };
+  });
+});
+
+// ── 어드민 전용 함수 ──────────────────────────────────────────────
+
+function assertAdmin(req) {
+  if (!req.auth || req.auth.uid !== ADMIN_UID) {
+    throw new Error('Unauthorized');
+  }
+}
+
+// 전체 유저 목록
+exports.adminGetUsers = onCall({ region: 'asia-northeast3' }, async (req) => {
+  assertAdmin(req);
+  const snap = await db.collection('users').get();
+  const users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  return { users };
+});
+
+// 개별 유저 루나 조정
+exports.adminAdjustLua = onCall({ region: 'asia-northeast3' }, async (req) => {
+  assertAdmin(req);
+  const { targetUid, delta } = req.data;
+  if (!targetUid || typeof delta !== 'number') throw new Error('Invalid params');
+  const userRef = db.collection('users').doc(targetUid);
+  await userRef.update({ lua: FieldValue.increment(delta) });
+  const updated = await userRef.get();
+  return { newBalance: updated.data().lua };
+});
+
+// 특정 유저 세션 목록
+exports.adminGetUserSessions = onCall({ region: 'asia-northeast3' }, async (req) => {
+  assertAdmin(req);
+  const { targetUid } = req.data;
+  const snap = await db.collection('sessions')
+    .where('userId', '==', targetUid)
+    .orderBy('createdAt', 'desc')
+    .limit(50)
+    .get();
+  const sessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return { sessions };
+});
+
+// 전체 문의 목록
+exports.adminGetMessages = onCall({ region: 'asia-northeast3' }, async (req) => {
+  assertAdmin(req);
+  const snap = await db.collection('messages')
+    .orderBy('createdAt', 'desc')
+    .limit(100)
+    .get();
+  const messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return { messages };
+});
+
+// 문의 답변
+exports.adminReplyMessage = onCall({ region: 'asia-northeast3' }, async (req) => {
+  assertAdmin(req);
+  const { messageId, reply } = req.data;
+  if (!messageId || !reply) throw new Error('Invalid params');
+  await db.collection('messages').doc(messageId).update({
+    reply,
+    repliedAt: FieldValue.serverTimestamp(),
+    isReadByAdmin: true,
+  });
+  return { ok: true };
 });

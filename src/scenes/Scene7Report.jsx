@@ -62,7 +62,7 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
         gap: 20, fontFamily: "'Press Start 2P'", color: '#c5a3f5',
       }}>
         <div style={{ fontSize: 48 }}>✦</div>
-        <div style={{ fontSize: '13px', lineHeight: 2 }}>
+        <div style={{ fontSize: 'var(--px-md)', lineHeight: 2 }}>
           최종 리포트 작성 중
           <span className="loading-dot">.</span>
           <span className="loading-dot">.</span>
@@ -87,7 +87,7 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
         <div style={{ fontSize: '16px', color: '#ffd700', lineHeight: 1.9 }}>
           {report?.title || '당신의 타로 여정'}
         </div>
-        <div style={{ fontSize: '11px', color: '#9b7fc4', marginTop: 10, lineHeight: 1.8 }}>
+        <div style={{ fontSize: 'var(--px-md)', color: '#9b7fc4', marginTop: 10, lineHeight: 1.8 }}>
           "{question}"
         </div>
       </div>
@@ -97,8 +97,8 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
         background: 'rgba(107,45,139,0.2)', border: '2px solid #6b2d8b',
         padding: '16px 18px', marginBottom: 20,
       }}>
-        <div style={{ fontSize: '11px', color: '#ffd700', marginBottom: 10 }}>▶ 핵심 메시지</div>
-        <div style={{ fontSize: '13px', color: '#f0e6ff', lineHeight: 2 }}>
+        <div style={{ fontSize: 'var(--px-md)', color: '#ffd700', marginBottom: 10 }}>▶ 핵심 메시지</div>
+        <div style={{ fontSize: 'var(--px-lg)', color: '#f0e6ff', lineHeight: 2 }}>
           {report?.coreMessage}
         </div>
       </div>
@@ -109,8 +109,8 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
           background: 'rgba(255,215,0,0.07)', border: '2px solid #ffd700',
           padding: '14px 18px', marginBottom: 20,
         }}>
-          <div style={{ fontSize: '11px', color: '#ffd700', marginBottom: 10 }}>▶ 카드가 가리키는 방향</div>
-          <div style={{ fontSize: '13px', color: '#ffd700', lineHeight: 2 }}>
+          <div style={{ fontSize: 'var(--px-md)', color: '#ffd700', marginBottom: 10 }}>▶ 카드가 가리키는 방향</div>
+          <div style={{ fontSize: 'var(--px-lg)', color: '#ffd700', lineHeight: 2 }}>
             {report.direction}
           </div>
         </div>
@@ -118,7 +118,7 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
 
       {/* Cards summary */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: '11px', color: '#ffd700', marginBottom: 12 }}>▶ 카드 리딩 요약</div>
+        <div style={{ fontSize: 'var(--px-md)', color: '#ffd700', marginBottom: 12 }}>▶ 카드 리딩 요약</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {cards.map((c, i) => (
             <div key={i} style={{
@@ -130,15 +130,15 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
                 <TarotCard card={c.card} faceDown={false} size="sm" />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '10px', color: '#ffd700', marginBottom: 6 }}>
+                <div style={{ fontSize: 'var(--px-sm)', color: '#ffd700', marginBottom: 6 }}>
                   {c.positionLabel} — {c.card?.korName}
                   {c.card?.isReversed && <span style={{ color: '#ff8c8c', marginLeft: 6 }}>(역)</span>}
                 </div>
-                <div style={{ fontSize: '12px', color: '#c5a3f5', lineHeight: 1.9 }}>
+                <div style={{ fontSize: 'var(--px-md)', color: '#c5a3f5', lineHeight: 1.9 }}>
                   {report?.cardSummaries?.[i] || c.reading}
                 </div>
                 {c.userAnswer && (
-                  <div style={{ fontSize: '10px', color: 'rgba(197,163,245,0.5)', marginTop: 6, borderTop: '1px solid rgba(107,45,139,0.3)', paddingTop: 6 }}>
+                  <div style={{ fontSize: 'var(--px-sm)', color: 'rgba(197,163,245,0.5)', marginTop: 6, borderTop: '1px solid rgba(107,45,139,0.3)', paddingTop: 6 }}>
                     답변: "{c.userAnswer}"
                   </div>
                 )}
@@ -151,11 +151,11 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
       {/* Advice */}
       {report?.advice?.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: '11px', color: '#ffd700', marginBottom: 12 }}>▶ 루나의 조언</div>
+          <div style={{ fontSize: 'var(--px-md)', color: '#ffd700', marginBottom: 12 }}>▶ 아이라의 조언</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {report.advice.map((a, i) => (
               <div key={i} style={{
-                fontSize: '12px', color: '#f0e6ff', lineHeight: 1.9,
+                fontSize: 'var(--px-md)', color: '#f0e6ff', lineHeight: 1.9,
                 padding: '10px 14px',
                 borderLeft: '3px solid #6b2d8b',
                 background: 'rgba(107,45,139,0.1)',
@@ -175,10 +175,10 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
           marginBottom: 20,
         }}>
           <div style={{ fontSize: 20, color: '#ffd700', marginBottom: 12 }}>✦</div>
-          <div style={{ fontSize: '13px', color: '#f0e6ff', lineHeight: 2 }}>
+          <div style={{ fontSize: 'var(--px-lg)', color: '#f0e6ff', lineHeight: 2 }}>
             "{report.closingWords}"
           </div>
-          <div style={{ fontSize: '11px', color: '#9b7fc4', marginTop: 10 }}>— 루나 (Luna)</div>
+          <div style={{ fontSize: 'var(--px-md)', color: '#9b7fc4', marginTop: 10 }}>— 아이라 (Aira)</div>
         </div>
       )}
 
@@ -190,27 +190,34 @@ export default function Scene7Report({ sessionId, question, spreadName, cards, c
           background: 'rgba(255,215,0,0.05)',
           marginBottom: 24,
         }}>
-          <div style={{ fontSize: '12px', color: '#ffd700' }}>리딩 결과 공유하기</div>
+          <div style={{ fontSize: 'var(--px-md)', color: '#ffd700' }}>리딩 결과 공유하기</div>
           <div style={{
-            fontSize: '10px', color: '#c5a3f5',
+            fontSize: 'var(--px-sm)', color: '#c5a3f5',
             padding: '8px 12px', background: 'rgba(27,10,46,0.8)',
             border: '1px solid #6b2d8b', wordBreak: 'break-all',
             maxWidth: '100%', lineHeight: 1.8,
           }}>
             {shareUrl}
           </div>
-          <button className="pixel-btn gold" onClick={handleCopyLink} style={{ fontSize: '12px' }}>
+          <button className="pixel-btn gold" onClick={handleCopyLink} style={{ fontSize: 'var(--px-md)' }}>
             {copied ? '✓ 복사됨!' : '🔗 링크 복사'}
           </button>
         </div>
       )}
 
-      {/* Restart */}
-      <div style={{ textAlign: 'center', paddingBottom: 20 }}>
+      {/* Restart + History */}
+      <div style={{ textAlign: 'center', paddingBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+        <button
+          className="pixel-btn secondary"
+          onClick={() => window.location.href = '/history'}
+          style={{ fontSize: 'var(--px-md)' }}
+        >
+          📜 내 기록 보기
+        </button>
         <button
           className="pixel-btn secondary"
           onClick={() => window.location.reload()}
-          style={{ fontSize: '12px' }}
+          style={{ fontSize: 'var(--px-md)' }}
         >
           ↩ 새 여정 시작
         </button>

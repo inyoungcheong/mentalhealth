@@ -68,19 +68,19 @@ export default function Scene5Spread({ question, coreIssue, onNext }) {
                 >
                   {/* Title */}
                   <div style={{
-                    fontFamily: "'Press Start 2P'", fontSize: '12px',
+                    fontFamily: "'Press Start 2P'", fontSize: 'var(--px-md)',
                     color: isSelected ? '#ffd700' : '#f0e6ff',
                     marginBottom: 10,
                     display: 'flex', alignItems: 'center', gap: 8,
                   }}>
                     {isSelected && <span style={{ color: '#ffd700' }}>▶ </span>}
                     {s.name}
-                    <span style={{ fontSize: '10px', color: '#9b7fc4' }}>({s.cards}장)</span>
+                    <span style={{ fontSize: 'var(--px-sm)', color: '#9b7fc4' }}>({s.cards}장)</span>
                   </div>
 
                   {/* Positions */}
                   <div style={{
-                    fontFamily: "'Press Start 2P'", fontSize: '9px',
+                    fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)',
                     color: 'rgba(197,163,245,0.7)',
                     marginBottom: 12, lineHeight: 1.8,
                   }}>
@@ -91,21 +91,21 @@ export default function Scene5Spread({ question, coreIssue, onNext }) {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                       <span style={{
-                        fontFamily: "'Press Start 2P'", fontSize: '9px',
+                        fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)',
                         color: '#4caf50', flexShrink: 0,
                       }}>▲</span>
                       <span style={{
-                        fontFamily: "'Press Start 2P'", fontSize: '9px',
+                        fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)',
                         color: '#c5e8c5', lineHeight: 1.8,
                       }}>{s.pros}</span>
                     </div>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                       <span style={{
-                        fontFamily: "'Press Start 2P'", fontSize: '9px',
+                        fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)',
                         color: '#ff8c8c', flexShrink: 0,
                       }}>▼</span>
                       <span style={{
-                        fontFamily: "'Press Start 2P'", fontSize: '9px',
+                        fontFamily: "'Press Start 2P'", fontSize: 'var(--px-sm)',
                         color: 'rgba(255,140,140,0.8)', lineHeight: 1.8,
                       }}>{s.cons}</span>
                     </div>
@@ -119,7 +119,7 @@ export default function Scene5Spread({ question, coreIssue, onNext }) {
             <button
               className="pixel-btn gold"
               onClick={handleConfirm}
-              style={{ fontSize: '11px', padding: '12px 24px', marginTop: 4 }}
+              style={{ fontSize: 'var(--px-md)', padding: '12px 24px', marginTop: 4 }}
             >
               ✓ {SPREADS[selected].name}으로 시작해
             </button>

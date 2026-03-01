@@ -10,12 +10,11 @@ const isInAppBrowser = /kakaotalk|instagram|fban|fbav|line\/|micromessenger/i.te
 );
 const isAndroid = /android/i.test(typeof navigator !== 'undefined' ? navigator.userAgent : '');
 
-export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
-  // Transition to login — deeperHook는 Scene3에서 이미 말했으므로 반복하지 않음
+export default function Scene4Analysis({ onNext }) {
   const lines = [
-    '그래, 좋은 선택이야.',
-    '저 문으로 들어가면, 카드들이 더 깊이 말해줄 거야.',
-    '계속하려면 로그인이 필요해.',
+    '질문이 전해졌어.',
+    '카드를 펼치기 전에 먼저 로그인해줘.',
+    '여정을 기록해둘게.',
   ];
 
   const [lineIdx, setLineIdx] = useState(0);
@@ -62,11 +61,12 @@ export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
 
   return (
     <div style={{
-      width: '100%', height: '100%',
+      width: '100%', minHeight: '100%',
       background: 'linear-gradient(180deg, #0d0020 0%, #1a0a2e 100%)',
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      gap: 20, padding: 20,
+      gap: 20, padding: '40px 20px',
+      boxSizing: 'border-box',
     }}>
       {/* Witch */}
       <div style={{
@@ -113,13 +113,13 @@ export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
             /* KakaoTalk / in-app browser: Google OAuth blocked */
             <>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#ff9f43',
+                fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#ff9f43',
                 textAlign: 'center', lineHeight: 2,
               }}>
                 ⚠ 카카오톡 브라우저에서는<br />구글 로그인이 지원되지 않아
               </div>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#c5a3f5',
+                fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#c5a3f5',
                 textAlign: 'center', lineHeight: 2,
               }}>
                 {isAndroid
@@ -129,14 +129,14 @@ export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
               <button
                 className="pixel-btn gold"
                 onClick={handleOpenExternal}
-                style={{ fontSize: '9px' }}
+                style={{ fontSize: 'var(--px-sm)' }}
               >
                 {isAndroid
                   ? '🌐 Chrome으로 열기'
                   : urlCopied ? '✓ 주소 복사됨!' : '📋 주소 복사하기'}
               </button>
               {!isAndroid && urlCopied && (
-                <div style={{ fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#c5a3f5', textAlign: 'center', lineHeight: 2 }}>
+                <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#c5a3f5', textAlign: 'center', lineHeight: 2 }}>
                   Safari 주소창에 붙여넣기 후 이동해줘
                 </div>
               )}
@@ -145,7 +145,7 @@ export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
             /* Normal login */
             <>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '8px', color: '#c5a3f5',
+                fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#c5a3f5',
                 textAlign: 'center', lineHeight: 1.8,
               }}>
                 여정을 기록하려면<br />로그인이 필요해
@@ -159,7 +159,7 @@ export default function Scene4Analysis({ coreIssue, deeperHook, onNext }) {
                 {loginLoading ? <span>로그인 중...</span> : <span>🔑 Google로 계속하기</span>}
               </button>
               {loginError && (
-                <div style={{ fontFamily: "'Press Start 2P'", fontSize: '7px', color: '#ff6b6b' }}>
+                <div style={{ fontFamily: "'Press Start 2P'", fontSize: 'var(--px-xs)', color: '#ff6b6b' }}>
                   {loginError}
                 </div>
               )}

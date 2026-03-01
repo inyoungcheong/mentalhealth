@@ -9,6 +9,8 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    host: '0.0.0.0',
+    allowedHosts: ['3000-i6n62s9mro7avqw9wqgrs-cc6e246c.us1.manus.computer', 'localhost', '127.0.0.1']
   }
 });

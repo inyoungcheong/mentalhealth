@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap');
 
 *, *::before, *::after {
   margin: 0;
@@ -7,29 +7,43 @@
 }
 
 :root {
-  --pixel-size: 3px;
-  --white: #ffffff;
-  --black: #000000;
-  --sky: #87ceeb;
-  --grass: #5a9e3a;
-  --dirt: #8b6914;
-  --stone: #888;
-  --witch-purple: #6b2d8b;
-  --witch-hat: #2d1a4e;
-  --card-back: #1a0a2e;
-  --gold: #ffd700;
-  --gold-muted: #e8c040;
-  --cream: #fffde7;
-  --text-dark: #1a1a2e;
-  --text-light: #f5f0ff;
-  --bubble-bg: rgba(255,255,255,0.95);
-  --shadow: rgba(0,0,0,0.15);
-  /* Refined palette - less saturated, more cohesive */
-  --wood-dark: #2d1a0a;
-  --wood-mid: #3d2817;
-  --wood-light: #4a3320;
-  --accent-purple: #9b7bb8;
-  --accent-gold: #e8c040;
+  /* ── Arcana Valley Inspired Palette ── */
+  /* Deep mystical backgrounds */
+  --bg-deep:       #0f0a1a;
+  --bg-dark:       #1a1428;
+  --bg-midnight:   #2a1f3d;
+
+  /* Warm earth tones - cute & sophisticated */
+  --earth-cream:   #f5ede0;
+  --earth-warm:    #e8d5c4;
+  --earth-tan:     #d4b896;
+  --earth-brown:   #8b6f47;
+  --earth-dark:    #5a4a38;
+
+  /* Mystical accents - no purple overlap */
+  --accent-gold:   #d4a574;
+  --accent-amber:  #c89860;
+  --accent-rose:   #c8927a;
+  --accent-sage:   #7a9b8e;
+  --accent-teal:   #6ba3a0;
+  --accent-indigo: #4a5a8a;
+
+  /* Soft glows */
+  --glow-gold:     rgba(212, 165, 116, 0.4);
+  --glow-rose:     rgba(200, 146, 122, 0.35);
+  --glow-sage:     rgba(122, 155, 142, 0.3);
+
+  /* Text colors */
+  --text-primary:  #f5ede0;
+  --text-secondary: #d4b896;
+  --text-muted:    #a89080;
+  --text-dark:     #3d2f25;
+
+  /* UI elements */
+  --border-light:  rgba(212, 165, 116, 0.3);
+  --border-mid:    rgba(212, 165, 116, 0.5);
+  --shadow-soft:   rgba(0, 0, 0, 0.3);
+  --shadow-deep:   rgba(0, 0, 0, 0.6);
 }
 
 html, body, #root {
@@ -39,27 +53,74 @@ html, body, #root {
 }
 
 body {
-  background: var(--white);
-  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-deep);
+  font-family: 'Outfit', sans-serif;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  color: var(--text-primary);
 }
 
-/* Pixel font sizes */
-.pixel-text-xs { font-size: 11px; line-height: 1.8; }
-.pixel-text-sm { font-size: 13px; line-height: 1.9; }
-.pixel-text-md { font-size: 15px; line-height: 2; }
-.pixel-text-lg { font-size: 20px; line-height: 2; }
+/* ── Typography System ── */
+.pixel-text-xs { font-size: 14px; font-weight: 500; line-height: 1.6; letter-spacing: 0.02em; }
+.pixel-text-sm { font-size: 16px; font-weight: 500; line-height: 1.7; letter-spacing: 0.01em; }
+.pixel-text-md { font-size: 18px; font-weight: 600; line-height: 1.8; }
+.pixel-text-lg { font-size: 22px; font-weight: 700; line-height: 1.9; }
 
-/* Game container */
+/* Playfair headings - elegant, sophisticated */
+.heading-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--accent-gold);
+  text-shadow: 0 2px 8px var(--shadow-deep);
+}
+
+.heading-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent-rose);
+}
+
+/* ── Game Container ── */
 .game-viewport {
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0a0015;
+  background: var(--bg-deep);
   overflow: hidden;
+  position: relative;
+}
+
+/* Subtle starfield background */
+.game-viewport::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 8% 12%, rgba(212, 165, 116, 0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 22% 35%, rgba(212, 165, 116, 0.25) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 42% 8%, rgba(212, 165, 116, 0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 58% 28%, rgba(200, 146, 122, 0.2) 0%, transparent 100%),
+    radial-gradient(1.3px 1.3px at 72% 52%, rgba(212, 165, 116, 0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 18%, rgba(212, 165, 116, 0.25) 0%, transparent 100%),
+    radial-gradient(1.1px 1.1px at 12% 68%, rgba(122, 155, 142, 0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 32% 82%, rgba(212, 165, 116, 0.2) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 52% 62%, rgba(200, 146, 122, 0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 75%, rgba(212, 165, 116, 0.2) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+  animation: twinkle-soft 6s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle-soft {
+  0%   { opacity: 0.5; }
+  50%  { opacity: 0.8; }
+  100% { opacity: 0.6; }
 }
 
 .game-screen {
@@ -67,96 +128,192 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden auto;
+  z-index: 1;
 }
 
-/* Wider panel on desktop */
 @media (min-width: 768px) {
   .game-screen {
-    max-width: 860px;
+    max-width: 900px;
     height: 100vh;
   }
 }
 
-/* Fade transitions */
+/* ── Scene Transitions ── */
 .fade-enter { opacity: 0; }
-.fade-enter-active { opacity: 1; transition: opacity 0.6s ease; }
+.fade-enter-active { opacity: 1; transition: opacity 0.8s ease; }
 .fade-exit { opacity: 1; }
-.fade-exit-active { opacity: 0; transition: opacity 0.4s ease; }
+.fade-exit-active { opacity: 0; transition: opacity 0.5s ease; }
 
-/* Typing animation */
+/* ── Typing Cursor ── */
 @keyframes typing-cursor {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
-
 .typing-cursor::after {
   content: '▊';
   animation: typing-cursor 0.8s infinite;
+  color: var(--accent-gold);
 }
 
-/* Button pixel style */
+/* ── Button Styles ── */
 .pixel-btn {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  padding: 10px 16px;
-  background: var(--witch-purple);
-  color: var(--text-light);
-  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, var(--earth-brown) 0%, var(--earth-dark) 100%);
+  color: var(--earth-cream);
+  border: 2px solid var(--accent-gold);
   cursor: pointer;
   position: relative;
   image-rendering: pixelated;
   outline: none;
-  /* Pixel border */
+  letter-spacing: 0.05em;
   box-shadow:
-    0 4px 0 #3d1a5a,
-    inset 0 1px 0 rgba(255,255,255,0.2);
-  transition: transform 0.1s, box-shadow 0.1s;
+    0 0 0 1px var(--accent-gold),
+    0 4px 12px var(--shadow-soft),
+    inset 0 1px 0 rgba(245, 237, 224, 0.1);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 4px;
 }
 
 .pixel-btn:hover {
-  background: #7d35a0;
+  background: linear-gradient(135deg, var(--earth-brown) 0%, var(--earth-dark) 100%);
+  border-color: var(--accent-rose);
+  box-shadow:
+    0 0 0 1px var(--accent-rose),
+    0 0 16px var(--glow-rose),
+    0 6px 16px var(--shadow-soft),
+    inset 0 1px 0 rgba(245, 237, 224, 0.15);
+  transform: translateY(-2px);
 }
 
 .pixel-btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #3d1a5a;
+  transform: translateY(0);
+  box-shadow:
+    0 0 0 1px var(--accent-gold),
+    0 2px 6px var(--shadow-soft),
+    inset 0 1px 0 rgba(245, 237, 224, 0.1);
 }
 
 .pixel-btn.secondary {
-  background: #555;
-  box-shadow: 0 4px 0 #222;
+  background: linear-gradient(135deg, var(--accent-indigo) 0%, #3a4a7a 100%);
+  color: var(--earth-cream);
+  border-color: var(--accent-teal);
+  box-shadow:
+    0 0 0 1px var(--accent-teal),
+    0 4px 12px var(--shadow-soft);
+}
+
+.pixel-btn.secondary:hover {
+  border-color: var(--accent-sage);
+  box-shadow:
+    0 0 0 1px var(--accent-sage),
+    0 0 12px var(--glow-sage),
+    0 6px 16px var(--shadow-soft);
 }
 
 .pixel-btn.gold {
-  background: #b8860b;
-  box-shadow: 0 4px 0 #7a5a00;
-  color: #fff9e0;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-amber) 100%);
+  color: var(--text-dark);
+  border-color: var(--earth-cream);
+  box-shadow:
+    0 0 0 1px var(--earth-cream),
+    0 0 12px var(--glow-gold),
+    0 4px 12px var(--shadow-soft);
 }
 
-/* Input */
+.pixel-btn.gold:hover {
+  box-shadow:
+    0 0 0 1px var(--earth-cream),
+    0 0 20px var(--glow-gold),
+    0 6px 16px var(--shadow-soft);
+  transform: translateY(-2px);
+}
+
+/* ── Input Styles ── */
 .pixel-input {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  padding: 8px 10px;
-  background: #f9f5ff;
-  border: 2px solid var(--witch-purple);
-  color: var(--text-dark);
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 12px 16px;
+  background: rgba(42, 31, 61, 0.8);
+  border: 2px solid var(--accent-gold);
+  color: var(--text-primary);
   outline: none;
   width: 100%;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(212, 165, 116, 0.2);
+  transition: all 0.2s ease;
+  border-radius: 4px;
 }
 
 .pixel-input:focus {
-  border-color: #9b4fc4;
-  box-shadow: 0 0 0 2px rgba(107,45,139,0.2);
+  border-color: var(--accent-rose);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(200, 146, 122, 0.3);
+  color: var(--earth-cream);
 }
 
-/* Loading dots */
+.pixel-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Loading Dots ── */
 @keyframes loading-dot {
-  0%, 20% { opacity: 0; }
+  0%, 20% { opacity: 0.4; }
   50% { opacity: 1; }
-  80%, 100% { opacity: 0; }
+  80%, 100% { opacity: 0.4; }
 }
-
 .loading-dot:nth-child(1) { animation: loading-dot 1.4s infinite 0s; }
 .loading-dot:nth-child(2) { animation: loading-dot 1.4s infinite 0.2s; }
 .loading-dot:nth-child(3) { animation: loading-dot 1.4s infinite 0.4s; }
+
+/* ── Decorative Elements ── */
+.ornament-border {
+  position: relative;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.ornament-border::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ── Glow Effects ── */
+.glow-gold {
+  text-shadow: 0 0 8px var(--glow-gold);
+}
+
+.glow-rose {
+  text-shadow: 0 0 8px var(--glow-rose);
+}
+
+.glow-sage {
+  text-shadow: 0 0 8px var(--glow-sage);
+}
+
+/* ── Responsive Adjustments ── */
+@media (max-width: 600px) {
+  .pixel-text-xs { font-size: 13px; }
+  .pixel-text-sm { font-size: 15px; }
+  .pixel-text-md { font-size: 17px; }
+  .pixel-text-lg { font-size: 20px; }
+  
+  .heading-title { font-size: 28px; }
+  .heading-subtitle { font-size: 18px; }
+  
+  .pixel-btn {
+    font-size: 13px;
+    padding: 12px 24px;
+  }
+}

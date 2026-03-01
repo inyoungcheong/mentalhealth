@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-// Typing effect chat bubble
+// Typing effect chat bubble with Arcana Valley aesthetic
 export default function ChatBubble({ text, speaker = 'witch', onDone, autoType = true, style = {} }) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
@@ -30,9 +30,9 @@ export default function ChatBubble({ text, speaker = 'witch', onDone, autoType =
   }, [text]);
 
   const colors = {
-    witch: { bg: 'rgba(45,26,78,0.95)', text: '#f0e6ff', border: '#9b4fc4' },
-    child: { bg: 'rgba(255,255,255,0.95)', text: '#1a1a2e', border: '#3a7bd5' },
-    system: { bg: 'rgba(255,253,231,0.97)', text: '#3d2a00', border: '#ffd700' },
+    witch: { bg: 'rgba(26, 20, 40, 0.96)', text: '#e8d5c4', border: '#c8927a' },
+    child: { bg: 'rgba(42, 31, 61, 0.96)', text: '#e8d5c4', border: '#7a9b8e' },
+    system: { bg: 'rgba(212, 165, 116, 0.12)', text: '#d4a574', border: '#d4a574' },
   };
 
   const c = colors[speaker] || colors.witch;
@@ -40,39 +40,41 @@ export default function ChatBubble({ text, speaker = 'witch', onDone, autoType =
   return (
     <div style={{
       position: 'relative',
-      padding: '14px 18px',
+      padding: '18px 22px',
       background: c.bg,
       border: `2px solid ${c.border}`,
-      borderRadius: 0,
-      fontFamily: "'Press Start 2P', monospace",
-      fontSize: '13px',
-      lineHeight: '2',
+      borderRadius: 6,
+      fontFamily: "'Outfit', sans-serif",
+      fontSize: '16px',
+      fontWeight: 500,
+      lineHeight: '1.8',
+      letterSpacing: '0.01em',
       color: c.text,
-      maxWidth: '560px',
-      boxShadow: `4px 4px 0 rgba(0,0,0,0.3)`,
+      maxWidth: '600px',
+      boxShadow: `0 8px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(212, 165, 116, 0.1)`,
       imageRendering: 'pixelated',
       ...style,
     }}>
-      {/* Pixel arrow — witch: bottom-right, child/system: bottom-left */}
+      {/* Smooth arrow pointer */}
       <div style={{
         position: 'absolute',
-        bottom: -10,
-        ...(speaker === 'witch' ? { right: 20 } : { left: 20 }),
+        bottom: -12,
+        ...(speaker === 'witch' ? { right: 24 } : { left: 24 }),
+        width: 0,
+        height: 0,
+        borderLeft: '10px solid transparent',
+        borderRight: '10px solid transparent',
+        borderTop: `12px solid ${c.border}`,
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: -9,
+        ...(speaker === 'witch' ? { right: 26 } : { left: 26 }),
         width: 0,
         height: 0,
         borderLeft: '8px solid transparent',
         borderRight: '8px solid transparent',
-        borderTop: `10px solid ${c.border}`,
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: -7,
-        ...(speaker === 'witch' ? { right: 22 } : { left: 22 }),
-        width: 0,
-        height: 0,
-        borderLeft: '6px solid transparent',
-        borderRight: '6px solid transparent',
-        borderTop: `8px solid ${c.bg}`,
+        borderTop: `10px solid ${c.bg}`,
       }} />
 
       <span>{displayed}</span>

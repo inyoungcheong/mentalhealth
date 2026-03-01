@@ -1,134 +1,131 @@
-/* =====================================================
-   CSS Pixel Art - Box Shadow Technique
-   All characters are built with 1px × 1px base unit
-   scaled by --pixel-size (3px default)
-   ===================================================== */
+/* ═══════════════════════════════════════════════════════════
+   ARCANA VALLEY INSPIRED PIXEL ART STYLES
+   Cute, Sophisticated, Trendy - Warm Earth Tones
+   ═══════════════════════════════════════════════════════════ */
 
-/* ─── PIXEL CHILD CHARACTER ─────────────────────────── */
-/* 16×16 pixel design */
-
-.pixel-char-wrap {
-  display: inline-block;
-  position: relative;
-}
-
-/* Child character using CSS custom property for color theme */
+/* ─── PIXEL CHILD CHARACTER ─────────────────────────────── */
 .pixel-child {
   width: 3px;
   height: 3px;
   position: relative;
-  /* shadow pixels: x y color */
   box-shadow:
-    /* Hair */
-    12px 0px #3d1c02, 15px 0px #3d1c02, 18px 0px #3d1c02,
-    9px 3px #3d1c02, 12px 3px #f5c5a3, 15px 3px #f5c5a3, 18px 3px #f5c5a3, 21px 3px #3d1c02,
-    /* Face */
-    9px 6px #3d1c02, 12px 6px #f5c5a3, 15px 6px #f5c5a3, 18px 6px #f5c5a3, 21px 6px #3d1c02,
-    /* Eyes */
-    9px 9px #3d1c02, 12px 9px #2d2d2d, 15px 9px #f5c5a3, 18px 9px #2d2d2d, 21px 9px #3d1c02,
-    /* Mouth */
-    9px 12px #3d1c02, 12px 12px #f5c5a3, 15px 12px #e07070, 18px 12px #f5c5a3, 21px 12px #3d1c02,
+    /* Hair - warm brown */
+    6px 0px #5a4a38, 9px 0px #5a4a38, 12px 0px #5a4a38, 15px 0px #5a4a38, 18px 0px #5a4a38,
+    3px 3px #5a4a38, 6px 3px #6b5a48, 9px 3px #6b5a48, 12px 3px #6b5a48, 15px 3px #6b5a48, 18px 3px #6b5a48, 21px 3px #5a4a38,
+    /* Face - warm cream */
+    3px 6px #e8d5c4, 6px 6px #f0ddd0, 9px 6px #f0ddd0, 12px 6px #f0ddd0, 15px 6px #f0ddd0, 18px 6px #f0ddd0, 21px 6px #e8d5c4,
+    3px 9px #e8d5c4, 6px 9px #f0ddd0, 9px 9px #f0ddd0, 12px 9px #f0ddd0, 15px 9px #f0ddd0, 18px 9px #f0ddd0, 21px 9px #e8d5c4,
+    /* Eyes - warm sage green (cute) */
+    6px 9px #7a9b8e, 9px 9px #7a9b8e, 15px 9px #7a9b8e, 18px 9px #7a9b8e,
+    /* Mouth - soft rose */
+    9px 12px #c8927a, 12px 12px #c8927a, 15px 12px #c8927a,
     /* Neck */
-    12px 15px #f5c5a3, 15px 15px #f5c5a3, 18px 15px #f5c5a3,
-    /* Body (shirt - blue) */
-    9px 18px #3a7bd5, 12px 18px #3a7bd5, 15px 18px #3a7bd5, 18px 18px #3a7bd5, 21px 18px #3a7bd5,
-    9px 21px #3a7bd5, 12px 21px #3a7bd5, 15px 21px #3a7bd5, 18px 21px #3a7bd5, 21px 21px #3a7bd5,
-    9px 24px #3a7bd5, 12px 24px #3a7bd5, 15px 24px #3a7bd5, 18px 24px #3a7bd5, 21px 24px #3a7bd5,
-    /* Arms */
-    6px 18px #f5c5a3, 24px 18px #f5c5a3,
-    6px 21px #f5c5a3, 24px 21px #f5c5a3,
-    /* Pants (dark blue) */
-    9px 27px #1a3a6e, 12px 27px #1a3a6e, 15px 27px #1a3a6e, 18px 27px #1a3a6e, 21px 27px #1a3a6e,
-    9px 30px #1a3a6e, 12px 30px #1a3a6e, 15px 30px #1a3a6e, 18px 30px #1a3a6e, 21px 30px #1a3a6e,
-    /* Shoes */
-    9px 33px #2d1a02, 12px 33px #2d1a02, 18px 33px #2d1a02, 21px 33px #2d1a02;
-  transform-origin: bottom center;
+    9px 15px #e8d5c4, 12px 15px #e8d5c4, 15px 15px #e8d5c4,
+    /* Tunic - warm sage (cute adventure) */
+    3px 18px #7a9b8e, 6px 18px #8aab9e, 9px 18px #8aab9e, 12px 18px #8aab9e,
+    15px 18px #8aab9e, 18px 18px #8aab9e, 21px 18px #7a9b8e,
+    3px 21px #7a9b8e, 6px 21px #8aab9e, 9px 21px #9abb9e, 12px 21px #8aab9e,
+    15px 21px #9abb9e, 18px 21px #8aab9e, 21px 21px #7a9b8e,
+    /* Belt - warm gold */
+    6px 24px #d4a574, 9px 24px #d4a574, 12px 24px #d4a574,
+    15px 24px #d4a574, 18px 24px #d4a574,
+    /* Pants - earth brown */
+    6px 27px #8b6f47, 9px 27px #8b6f47, 12px 27px #8b6f47,
+    15px 27px #8b6f47, 18px 27px #8b6f47,
+    6px 30px #6b5a38, 9px 30px #6b5a38, 15px 30px #6b5a38, 18px 30px #6b5a38,
+    /* Boots - dark earth */
+    6px 33px #3d2f25, 9px 33px #3d2f25, 15px 33px #3d2f25, 18px 33px #3d2f25;
+  filter: drop-shadow(0 0 2px rgba(212, 165, 116, 0.2));
 }
 
-/* ─── PIXEL WITCH CHARACTER ──────────────────────────── */
-/* 20×32 pixel design */
-
+/* ─── PIXEL WITCH CHARACTER ──────────────────────────────── */
 .pixel-witch {
   width: 3px;
   height: 3px;
   position: relative;
   box-shadow:
-    /* Hat brim */
-    6px 0px #2d1a4e, 9px 0px #2d1a4e, 12px 0px #2d1a4e, 15px 0px #2d1a4e,
-    18px 0px #2d1a4e, 21px 0px #2d1a4e, 24px 0px #2d1a4e, 27px 0px #2d1a4e,
-    /* Hat body */
-    9px 3px #2d1a4e, 12px 3px #2d1a4e, 15px 3px #6b2d8b, 18px 3px #2d1a4e,
-    9px 6px #2d1a4e, 12px 6px #2d1a4e, 15px 6px #2d1a4e, 18px 6px #2d1a4e,
-    /* Hat star decoration */
-    15px 3px #ffd700,
-    /* Hair */
-    6px 9px #2d0a5a, 9px 9px #4a0e8f, 12px 9px #c5a3f5,
-    15px 9px #c5a3f5, 18px 9px #c5a3f5, 21px 9px #4a0e8f, 24px 9px #2d0a5a,
+    /* Pointed hat - deep midnight */
+    15px 0px #2a1f3d,
+    12px 3px #2a1f3d, 15px 3px #2a1f3d, 18px 3px #2a1f3d,
+    9px 6px #2a1f3d, 12px 6px #2a1f3d, 15px 6px #2a1f3d, 18px 6px #2a1f3d, 21px 6px #2a1f3d,
+    /* Hat brim - warm gold */
+    6px 9px #d4a574, 9px 9px #d4a574, 12px 9px #d4a574, 15px 9px #2a1f3d,
+    18px 9px #d4a574, 21px 9px #d4a574, 24px 9px #d4a574,
+    /* Hair - silver cream */
+    9px 12px #e8d5c4, 12px 12px #e8d5c4, 15px 12px #e8d5c4, 18px 12px #e8d5c4, 21px 12px #e8d5c4,
     /* Face */
-    9px 12px #4a0e8f, 12px 12px #f5e0d5, 15px 12px #f5e0d5, 18px 12px #f5e0d5, 21px 12px #4a0e8f,
-    /* Eyes (green - witch eyes!) */
-    9px 15px #4a0e8f, 12px 15px #00c864, 15px 15px #f5e0d5, 18px 15px #00c864, 21px 15px #4a0e8f,
+    9px 15px #2a1f3d, 12px 15px #f0ddd0, 15px 15px #f0ddd0, 18px 15px #f0ddd0, 21px 15px #2a1f3d,
+    /* Eyes - warm rose (magical) */
+    12px 15px #c8927a, 15px 15px #f0ddd0, 18px 15px #c8927a,
     /* Mouth */
-    9px 18px #4a0e8f, 12px 18px #f5e0d5, 15px 18px #c85a5a, 18px 18px #f5e0d5, 21px 18px #4a0e8f,
-    /* Side hair flowing down */
-    6px 12px #2d0a5a, 6px 15px #4a0e8f, 6px 18px #4a0e8f,
-    24px 12px #2d0a5a, 24px 15px #4a0e8f, 24px 18px #4a0e8f,
+    12px 18px #f0ddd0, 15px 18px #a87060, 18px 18px #f0ddd0,
+    /* Side hair */
+    6px 12px #d4b896, 6px 15px #d4b896, 6px 18px #d4b896,
+    24px 12px #d4b896, 24px 15px #d4b896, 24px 18px #d4b896,
     /* Neck */
-    12px 21px #f5e0d5, 15px 21px #f5e0d5, 18px 21px #f5e0d5,
-    /* Robe (purple) */
-    6px 24px #6b2d8b, 9px 24px #6b2d8b, 12px 24px #6b2d8b,
-    15px 24px #6b2d8b, 18px 24px #6b2d8b, 21px 24px #6b2d8b, 24px 24px #6b2d8b,
-    6px 27px #5a2578, 9px 27px #6b2d8b, 12px 27px #7d35a0,
-    15px 27px #6b2d8b, 18px 27px #7d35a0, 21px 27px #6b2d8b, 24px 27px #5a2578,
-    /* Sleeves / arms */
-    3px 24px #5a2578, 3px 27px #5a2578,
-    27px 24px #5a2578, 27px 27px #5a2578,
-    /* Hands holding tarot */
-    3px 30px #f5e0d5, 27px 30px #f5e0d5,
+    12px 21px #f0ddd0, 15px 21px #f0ddd0, 18px 21px #f0ddd0,
+    /* Robe - warm indigo with rose accent */
+    6px 24px #4a5a8a, 9px 24px #5a6a9a, 12px 24px #5a6a9a,
+    15px 24px #5a6a9a, 18px 24px #5a6a9a, 21px 24px #5a6a9a, 24px 24px #4a5a8a,
+    6px 27px #3a4a7a, 9px 27px #4a5a8a, 12px 27px #6a7aaa,
+    15px 27px #5a6a9a, 18px 27px #6a7aaa, 21px 27px #4a5a8a, 24px 27px #3a4a7a,
+    /* Rune accent on robe - rose */
+    15px 24px #c8927a,
+    /* Sleeves */
+    3px 24px #3a4a7a, 3px 27px #3a4a7a,
+    27px 24px #3a4a7a, 27px 27px #3a4a7a,
+    /* Hands */
+    3px 30px #f0ddd0, 27px 30px #f0ddd0,
     /* Skirt */
-    3px 30px #5a2578, 6px 30px #6b2d8b, 9px 30px #6b2d8b,
-    12px 30px #7d35a0, 15px 30px #6b2d8b, 18px 30px #7d35a0,
-    21px 30px #6b2d8b, 24px 30px #6b2d8b, 27px 30px #5a2578,
-    /* Shoes (black pointy) */
-    6px 33px #1a1a1a, 9px 33px #1a1a1a,
-    21px 33px #1a1a1a, 24px 33px #1a1a1a,
-    3px 33px #1a1a1a,  27px 33px #1a1a1a;
+    3px 30px #3a4a7a, 6px 30px #4a5a8a, 9px 30px #5a6a9a,
+    12px 30px #6a7aaa, 15px 30px #5a6a9a, 18px 30px #6a7aaa,
+    21px 30px #5a6a9a, 24px 30px #4a5a8a, 27px 30px #3a4a7a,
+    /* Boots - dark with gold accent */
+    6px 33px #2a1f3d, 9px 33px #2a1f3d,
+    21px 33px #2a1f3d, 24px 33px #2a1f3d,
+    3px 33px #2a1f3d, 27px 33px #2a1f3d,
+    /* Gold buckle */
+    7px 33px #d4a574, 22px 33px #d4a574;
+  filter: drop-shadow(0 0 3px rgba(200, 146, 122, 0.25));
 }
 
 /* ─── TAROT CARD PIXEL ───────────────────────────────── */
-
 .pixel-tarot-card {
   width: 3px;
   height: 3px;
   box-shadow:
-    /* Card back - dark purple with gold border */
-    /* Outer border */
-    3px 0px #ffd700, 6px 0px #ffd700, 9px 0px #ffd700, 12px 0px #ffd700,
-    15px 0px #ffd700, 18px 0px #ffd700, 21px 0px #ffd700, 24px 0px #ffd700,
-    27px 0px #ffd700,
-    3px 3px #ffd700, 27px 3px #ffd700,
-    3px 6px #ffd700, 27px 6px #ffd700,
-    3px 9px #ffd700, 27px 9px #ffd700,
-    3px 12px #ffd700, 27px 12px #ffd700,
-    3px 15px #ffd700, 27px 15px #ffd700,
-    3px 18px #ffd700, 27px 18px #ffd700,
-    3px 21px #ffd700, 27px 21px #ffd700,
-    3px 24px #ffd700, 27px 24px #ffd700,
-    3px 27px #ffd700, 27px 27px #ffd700,
-    3px 30px #ffd700, 27px 30px #ffd700,
-    3px 33px #ffd700, 27px 33px #ffd700,
-    3px 36px #ffd700, 6px 36px #ffd700, 9px 36px #ffd700, 12px 36px #ffd700,
-    15px 36px #ffd700, 18px 36px #ffd700, 21px 36px #ffd700, 24px 36px #ffd700,
-    27px 36px #ffd700,
-    /* Inner fill */
-    6px 3px #1a0a2e, 9px 3px #1a0a2e, 12px 3px #1a0a2e, 15px 3px #1a0a2e,
-    18px 3px #1a0a2e, 21px 3px #1a0a2e, 24px 3px #1a0a2e,
-    /* Star pattern */
-    15px 12px #ffd700, 12px 15px #ffd700, 15px 15px #c084fc, 18px 15px #ffd700,
-    15px 18px #ffd700,
-    /* Background fill lines */
-    6px 6px #1a0a2e, 9px 6px #1a0a2e, 12px 6px #2d1a4e, 15px 6px #1a0a2e,
-    18px 6px #2d1a4e, 21px 6px #1a0a2e, 24px 6px #1a0a2e;
+    /* Card back - deep with warm gold border */
+    3px 0px #d4a574, 6px 0px #d4a574, 9px 0px #d4a574, 12px 0px #d4a574,
+    15px 0px #d4a574, 18px 0px #d4a574, 21px 0px #d4a574, 24px 0px #d4a574,
+    27px 0px #d4a574,
+    3px 3px #d4a574, 27px 3px #d4a574,
+    3px 6px #d4a574, 27px 6px #d4a574,
+    3px 9px #d4a574, 27px 9px #d4a574,
+    3px 12px #d4a574, 27px 12px #d4a574,
+    3px 15px #d4a574, 27px 15px #d4a574,
+    3px 18px #d4a574, 27px 18px #d4a574,
+    3px 21px #d4a574, 27px 21px #d4a574,
+    3px 24px #d4a574, 27px 24px #d4a574,
+    3px 27px #d4a574, 27px 27px #d4a574,
+    3px 30px #d4a574, 27px 30px #d4a574,
+    3px 33px #d4a574, 27px 33px #d4a574,
+    3px 36px #d4a574, 6px 36px #d4a574, 9px 36px #d4a574, 12px 36px #d4a574,
+    15px 36px #d4a574, 18px 36px #d4a574, 21px 36px #d4a574, 24px 36px #d4a574,
+    27px 36px #d4a574,
+    /* Inner fill - deep night */
+    6px 3px #1a1428, 9px 3px #1a1428, 12px 3px #1a1428, 15px 3px #1a1428,
+    18px 3px #1a1428, 21px 3px #1a1428, 24px 3px #1a1428,
+    /* Mystical symbol - warm rose and sage */
+    15px 9px #d4a574,
+    12px 12px #d4a574, 15px 12px #1a1428, 18px 12px #d4a574,
+    12px 15px #d4a574, 15px 15px #d4a574, 18px 15px #d4a574,
+    /* Rune dots - rose and sage accents */
+    9px 21px #c8927a, 15px 21px #7a9b8e, 21px 21px #c8927a,
+    9px 27px #c8927a, 21px 27px #c8927a,
+    /* Background fill */
+    6px 6px #1a1428, 9px 6px #1a1428, 12px 6px #2a1f3d, 15px 6px #1a1428,
+    18px 6px #2a1f3d, 21px 6px #1a1428, 24px 6px #1a1428;
+  filter: drop-shadow(0 0 3px rgba(212, 165, 116, 0.3));
 }
 
 /* ─── ANIMATIONS ─────────────────────────────────────── */
@@ -144,18 +141,18 @@
   50%       { transform: translateY(-3px); }
 }
 
-/* Idle bob */
+/* Idle bob - gentle, charming */
 @keyframes idle-bob {
   0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-4px); }
+  50%       { transform: translateY(-5px); }
 }
 
 .pixel-child-animated {
-  animation: idle-bob 1.2s ease-in-out infinite;
+  animation: idle-bob 1.4s ease-in-out infinite;
 }
 
 .pixel-witch-animated {
-  animation: idle-bob 1.4s ease-in-out infinite;
+  animation: idle-bob 1.6s ease-in-out infinite;
 }
 
 /* Walking animation */
@@ -163,25 +160,26 @@
   animation: walk-right 2s linear forwards, walk-leg-bob 0.3s ease-in-out infinite;
 }
 
-/* Appear animation */
+/* Appear animation - magical pop */
 @keyframes appear-pop {
-  0%   { transform: scale(0) translateY(20px); opacity: 0; }
-  60%  { transform: scale(1.15) translateY(-4px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+  0%   { transform: scale(0) translateY(20px); opacity: 0; filter: brightness(2); }
+  40%  { transform: scale(1.2) translateY(-6px); opacity: 1; filter: brightness(1.3); }
+  70%  { transform: scale(0.95) translateY(2px); filter: brightness(1.05); }
+  100% { transform: scale(1) translateY(0); opacity: 1; filter: brightness(1); }
 }
 
 .appear-pop {
-  animation: appear-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: appear-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* Float for cards */
+/* Float for cards - gentle levitation */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
+  50%       { transform: translateY(-10px); }
 }
 
 .float-anim {
-  animation: float 3s ease-in-out infinite;
+  animation: float 3.5s ease-in-out infinite;
 }
 
 /* Shake for dice */
@@ -199,25 +197,81 @@
   animation: dice-shake 0.6s ease-in-out;
 }
 
-/* Card flip */
+/* Card flip - magical reveal */
 @keyframes card-flip {
-  0%   { transform: rotateY(0deg); }
-  50%  { transform: rotateY(90deg); }
-  100% { transform: rotateY(0deg); }
+  0%   { transform: rotateY(0deg) scale(1); }
+  30%  { transform: rotateY(90deg) scale(1.05); filter: brightness(1.6); }
+  50%  { transform: rotateY(90deg) scale(1.05); }
+  100% { transform: rotateY(0deg) scale(1); }
 }
 
 .card-flip {
-  animation: card-flip 0.6s ease-in-out;
+  animation: card-flip 0.7s ease-in-out;
   transform-style: preserve-3d;
 }
 
-/* Sparkle */
+/* Sparkle - warm glow */
 @keyframes sparkle {
   0%   { opacity: 0; transform: scale(0) rotate(0deg); }
-  50%  { opacity: 1; transform: scale(1) rotate(180deg); }
+  40%  { opacity: 1; transform: scale(1.2) rotate(120deg); }
+  60%  { opacity: 1; transform: scale(1) rotate(200deg); }
   100% { opacity: 0; transform: scale(0) rotate(360deg); }
 }
 
 .sparkle {
-  animation: sparkle 1s ease-in-out infinite;
+  animation: sparkle 1.2s ease-in-out infinite;
+}
+
+/* Warm glow pulse */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 4px currentColor); }
+  50%       { opacity: 1; filter: drop-shadow(0 0 10px currentColor); }
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Gentle shimmer */
+@keyframes shimmer {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 4px rgba(212, 165, 116, 0.3)); }
+  50%       { filter: brightness(1.2) drop-shadow(0 0 10px rgba(212, 165, 116, 0.5)); }
+}
+
+.shimmer {
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+/* Scene entrance - smooth reveal */
+@keyframes magic-reveal {
+  0%   { opacity: 0; transform: scale(0.95) translateY(8px); filter: blur(3px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+
+.magic-reveal {
+  animation: magic-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Gentle heart beat */
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  20%       { transform: scale(1.15); }
+  40%       { transform: scale(1); }
+  60%       { transform: scale(1.08); }
+}
+
+.heart-beat {
+  animation: heart-beat 1.5s ease-in-out infinite;
+}
+
+/* Soft flicker */
+@keyframes soft-flicker {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  25%       { opacity: 0.95; transform: scaleY(1.03); }
+  50%       { opacity: 0.98; transform: scaleY(0.98); }
+  75%       { opacity: 0.92; transform: scaleY(1.02); }
+}
+
+.soft-flicker {
+  animation: soft-flicker 1.8s ease-in-out infinite;
 }

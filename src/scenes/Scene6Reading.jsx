@@ -19,7 +19,7 @@ const LOADING_MSGS = [
   '카드의 색감이나 분위기가 어떤 느낌을 줘?',
 ];
 
-export default function Scene6Reading({ sessionId, question, coreIssue, spreadName, positions, cardCount, onNext }) {
+export default function Scene6Reading({ sessionId, question, coreIssue, oracleAnswer, spreadName, positions, cardCount, onNext }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [drawnCards, setDrawnCards] = useState([]);
   const [currentCard, setCurrentCard] = useState(null);
@@ -69,6 +69,7 @@ export default function Scene6Reading({ sessionId, question, coreIssue, spreadNa
         question,
         coreIssue: coreIssue || '',
         allAnswers: allCards.map(c => ({ positionLabel: c.positionLabel, answer: c.userAnswer })),
+        oracleAnswer: oracleAnswer || '',
       });
       setReading(result.reading);
       setNextQuestion(result.nextQuestion || '이 상황에서 어떤 선택이 가장 어렵게 느껴져?');

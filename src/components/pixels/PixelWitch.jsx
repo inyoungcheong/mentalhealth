@@ -36,6 +36,7 @@ const P = {
   eyeGlow:    '#ffe080',
   eyePupil:   '#2a1a08',
   mouth:      '#c07878',
+  blush:      'rgba(220,160,160,0.35)',
   robe:       '#3a2060',
   robeMid:    '#4a2878',
   robeDark:   '#251540',
@@ -93,6 +94,9 @@ export function WitchSprite({ style = {} }) {
       <div style={{ position: 'absolute', top: 15, left: 5, width: 18, height: 14, background: P.skin }} />
       <div style={{ position: 'absolute', top: 20, left: 5, width: 3, height: 5, background: P.skinShadow, opacity: 0.4 }} />
       <div style={{ position: 'absolute', top: 20, left: 20, width: 3, height: 5, background: P.skinShadow, opacity: 0.4 }} />
+      {/* Subtle blush */}
+      <div style={{ position: 'absolute', top: 23, left: 6, width: 2, height: 2, background: P.blush, borderRadius: 1 }} />
+      <div style={{ position: 'absolute', top: 23, left: 20, width: 2, height: 2, background: P.blush, borderRadius: 1 }} />
       {/* Glowing amber eyes */}
       <div style={{ position: 'absolute', top: 19, left: 8, width: 4, height: 4, background: P.eyes, boxShadow: `0 0 3px ${P.eyeGlow}` }} />
       <div style={{ position: 'absolute', top: 19, left: 16, width: 4, height: 4, background: P.eyes, boxShadow: `0 0 3px ${P.eyeGlow}` }} />
@@ -100,16 +104,17 @@ export function WitchSprite({ style = {} }) {
       <div style={{ position: 'absolute', top: 20, left: 17, width: 2, height: 2, background: P.eyePupil }} />
       <div style={{ position: 'absolute', top: 19, left: 9, width: 1, height: 1, background: P.eyeGlow, opacity: 0.9 }} />
       <div style={{ position: 'absolute', top: 19, left: 17, width: 1, height: 1, background: P.eyeGlow, opacity: 0.9 }} />
-      {/* Eyebrows */}
-      <div style={{ position: 'absolute', top: 17, left: 8, width: 5, height: 1, background: P.hairDark }} />
-      <div style={{ position: 'absolute', top: 16, left: 11, width: 2, height: 1, background: P.hairDark }} />
-      <div style={{ position: 'absolute', top: 17, left: 15, width: 5, height: 1, background: P.hairDark }} />
-      <div style={{ position: 'absolute', top: 16, left: 15, width: 2, height: 1, background: P.hairDark }} />
+      {/* Eyebrows - gentle arch, friendly expression */}
+      <div style={{ position: 'absolute', top: 17, left: 8, width: 6, height: 1, background: P.hairDark }} />
+      <div style={{ position: 'absolute', top: 18, left: 13, width: 1, height: 1, background: P.hairDark, opacity: 0.6 }} />
+      <div style={{ position: 'absolute', top: 17, left: 15, width: 6, height: 1, background: P.hairDark }} />
+      <div style={{ position: 'absolute', top: 18, left: 15, width: 1, height: 1, background: P.hairDark, opacity: 0.6 }} />
       {/* Nose */}
       <div style={{ position: 'absolute', top: 24, left: 13, width: 2, height: 2, background: P.skinShadow }} />
-      {/* Mouth */}
-      <div style={{ position: 'absolute', top: 27, left: 10, width: 8, height: 2, background: P.mouth }} />
-      <div style={{ position: 'absolute', top: 28, left: 16, width: 3, height: 1, background: P.mouth }} />
+      {/* Mouth - gentle smile */}
+      <div style={{ position: 'absolute', top: 28, left: 10, width: 2, height: 1, background: P.mouth }} />
+      <div style={{ position: 'absolute', top: 27, left: 12, width: 4, height: 1, background: P.mouth }} />
+      <div style={{ position: 'absolute', top: 28, left: 16, width: 2, height: 1, background: P.mouth }} />
 
       {/* ===== NECK ===== */}
       <div style={{ position: 'absolute', top: 29, left: 10, width: 8, height: 4, background: P.skin }} />

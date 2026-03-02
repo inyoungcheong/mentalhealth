@@ -11,8 +11,9 @@ export default function OracleTable({ children, style = {} }) {
         position: 'relative',
         width: '100%',
         maxWidth: 600,
-        minHeight: 240,
-        /* Deep violet velvet cloth - Arcana Village oracle table */
+        minHeight: 320,
+        minWidth: 320,
+        /* Deep violet velvet cloth - oracle table (fixed feel) */
         background: `
           radial-gradient(ellipse at 50% 0%, rgba(140, 80, 220, 0.18) 0%, transparent 55%),
           radial-gradient(ellipse at 50% 100%, rgba(80, 20, 120, 0.2) 0%, transparent 55%),

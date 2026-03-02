@@ -78,8 +78,10 @@ export function ChildSprite({ walking = false, style = {} }) {
       
       {/* Nose */}
       <div style={{ position: 'absolute', top: 12, left: 11, width: 2, height: 1, background: PALETTE.skinShadow }} />
-      {/* Mouth */}
-      <div style={{ position: 'absolute', top: 14, left: 10, width: 4, height: 1, background: PALETTE.mouth }} />
+      {/* Mouth - gentle smile */}
+      <div style={{ position: 'absolute', top: 15, left: 10, width: 1, height: 1, background: PALETTE.mouth }} />
+      <div style={{ position: 'absolute', top: 14, left: 11, width: 2, height: 1, background: PALETTE.mouth }} />
+      <div style={{ position: 'absolute', top: 15, left: 13, width: 1, height: 1, background: PALETTE.mouth }} />
 
       {/* === HOODED CLOAK === */}
       {/* Hood top */}

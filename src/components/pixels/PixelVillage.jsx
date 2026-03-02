@@ -13,13 +13,13 @@ export default function PixelVillage({ children, style = {} }) {
       imageRendering: 'pixelated',
       ...style,
     }}>
-      {/* ===== SKY - warm dusk gradient (Mystical twilight feel) ===== */}
+      {/* ===== SKY - soft twilight gradient (cohesive warm tones) ===== */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: '58%',
-        background: 'linear-gradient(180deg, #1a0f3a 0%, #3a1a5a 25%, #6a2a6a 50%, #c85a3a 75%, #e8a050 100%)',
+        background: 'linear-gradient(180deg, #1e1538 0%, #2d1f4a 20%, #4a2d5a 40%, #6b3d4a 65%, #d4895a 85%, #f0c890 100%)',
       }} />
 
-      {/* ===== STARS ===== */}
+      {/* ===== STARS - warm white/gold tones (no green) ===== */}
       {[
         [8,4],[40,8],[90,3],[130,12],[180,5],[220,9],[270,3],[310,14],[360,6],[400,10],[450,4],
         [25,20],[75,16],[160,22],[240,18],[320,20],[430,15],
@@ -27,67 +27,66 @@ export default function PixelVillage({ children, style = {} }) {
         <div key={i} style={{
           position: 'absolute', left: sx, top: sy,
           width: i % 3 === 0 ? 2 : 1, height: i % 3 === 0 ? 2 : 1,
-          background: i % 4 === 0 ? '#e8d0ff' : '#fff8e0',
-          opacity: 0.7 + (i % 3) * 0.1,
+          background: i % 3 === 0 ? '#fff8e8' : '#f8ecd8',
+          opacity: 0.6 + (i % 3) * 0.15,
           animation: `starTwinkle ${1.5 + (i % 4) * 0.4}s ease-in-out infinite ${(i % 5) * 0.3}s`,
         }} />
       ))}
 
-      {/* ===== MOON ===== */}
+      {/* ===== MOON - soft cream with gentle glow ===== */}
       <div style={{
         position: 'absolute', top: 14, right: 70,
         width: 28, height: 28,
-        background: '#f8e8c0',
+        background: 'radial-gradient(circle at 35% 35%, #fff8e8, #f5e6c8)',
         borderRadius: '50%',
-        boxShadow: '0 0 10px rgba(248,232,192,0.5), 0 0 22px rgba(248,232,192,0.2)',
+        boxShadow: '0 0 12px rgba(255,245,220,0.6), 0 0 24px rgba(248,232,200,0.25)',
       }} />
-      {/* Moon crescent shadow */}
+      {/* Moon crescent - softer overlap */}
       <div style={{
         position: 'absolute', top: 16, right: 76,
-        width: 22, height: 22,
-        background: '#3a1a5a',
+        width: 20, height: 20,
+        background: '#2d1f4a',
         borderRadius: '50%',
-        opacity: 0.7,
+        opacity: 0.6,
       }} />
 
-      {/* ===== DISTANT MOUNTAINS ===== */}
+      {/* ===== DISTANT MOUNTAINS - softer silhouettes ===== */}
       <div style={{
         position: 'absolute', bottom: '42%', left: 0, right: 0, height: 60,
-        background: '#2a1a4a',
+        background: '#251a3a',
         clipPath: 'polygon(0% 100%, 5% 30%, 12% 60%, 20% 10%, 28% 50%, 38% 20%, 48% 55%, 55% 15%, 65% 45%, 75% 5%, 85% 40%, 92% 20%, 100% 50%, 100% 100%)',
       }} />
       <div style={{
         position: 'absolute', bottom: '42%', left: 0, right: 0, height: 45,
-        background: '#3a2060',
+        background: '#2d2045',
         clipPath: 'polygon(0% 100%, 8% 40%, 18% 70%, 30% 25%, 42% 65%, 52% 30%, 62% 60%, 72% 20%, 82% 55%, 92% 35%, 100% 60%, 100% 100%)',
       }} />
 
-      {/* ===== MYSTICAL BUILDINGS (Arcana Village style) ===== */}
-      <ArcanaBuilding x={20}  h={85}  w={38} color="#2a1848" roofColor="#1a0f30" windows={2} accent="#6040a0" />
-      <ArcanaBuilding x={80}  h={105} w={46} color="#321a52" roofColor="#201040" windows={3} accent="#7050b0" />
-      <ArcanaBuilding x={170} h={92}  w={42} color="#2a1848" roofColor="#1a0f30" windows={2} accent="#5a3890" />
-      <ArcanaBuilding x={268} h={115} w={52} color="#3a2060" roofColor="#251540" windows={4} accent="#8060c0" />
-      <ArcanaBuilding x={368} h={98}  w={46} color="#2e1a50" roofColor="#1c1038" windows={3} accent="#6848a8" />
-      <ArcanaBuilding x={438} h={88}  w={40} color="#2a1848" roofColor="#1a0f30" windows={2} accent="#5a3890" />
+      {/* ===== MYSTICAL BUILDINGS - warmer, cohesive palette ===== */}
+      <ArcanaBuilding x={20}  h={85}  w={38} color="#2d2048" roofColor="#1e1538" windows={2} accent="#7a5ab0" />
+      <ArcanaBuilding x={80}  h={105} w={46} color="#352250" roofColor="#251a40" windows={3} accent="#8a6ac0" />
+      <ArcanaBuilding x={170} h={92}  w={42} color="#2d2048" roofColor="#1e1538" windows={2} accent="#6a4a98" />
+      <ArcanaBuilding x={268} h={115} w={52} color="#3d2858" roofColor="#2a1f48" windows={4} accent="#9a7ad0" />
+      <ArcanaBuilding x={368} h={98}  w={46} color="#322248" roofColor="#221838" windows={3} accent="#7a5ab0" />
+      <ArcanaBuilding x={438} h={88}  w={40} color="#2d2048" roofColor="#1e1538" windows={2} accent="#6a4a98" />
 
-      {/* ===== GROUND - layered grass ===== */}
+      {/* ===== GROUND - mystical forest floor (deeper, richer greens) ===== */}
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0, height: '46%',
-        background: '#1a3a18',
+        background: '#152518',
       }} />
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0, height: '38%',
-        background: '#2a5a20',
+        background: '#1e3820',
       }} />
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0, height: '28%',
-        background: '#3a7028',
+        background: '#284828',
       }} />
-      {/* Grass highlight edge */}
+      {/* Grass highlight - softer edge */}
       <div style={{
         position: 'absolute', bottom: '28%', left: 0, right: 0, height: 4,
-        background: '#50a030',
-        opacity: 0.6,
+        background: 'linear-gradient(180deg, rgba(80,140,60,0.4), transparent)',
       }} />
 
       {/* ===== COBBLESTONE PATH ===== */}
@@ -129,15 +128,15 @@ export default function PixelVillage({ children, style = {} }) {
       <MagicLantern x={188} />
       <MagicLantern x={328} />
 
-      {/* ===== FIREFLIES ===== */}
+      {/* ===== FIREFLIES - warm amber glow (matches sky) ===== */}
       {[70, 130, 290, 390].map((fx, i) => (
         <div key={i} style={{
           position: 'absolute',
           left: fx, bottom: `${55 + (i % 3) * 8}%`,
           width: 3, height: 3,
-          background: '#a0ff80',
+          background: '#f8e8a0',
           borderRadius: '50%',
-          boxShadow: '0 0 4px #a0ff80',
+          boxShadow: '0 0 6px rgba(248,232,160,0.8)',
           animation: `firefly ${2 + i * 0.5}s ease-in-out infinite ${i * 0.7}s`,
         }} />
       ))}
@@ -194,16 +193,16 @@ function ArcanaBuilding({ x, h, w, color, roofColor, windows = 2, accent }) {
         background: accent,
         opacity: 0.8,
       }} />
-      {/* Windows - glowing purple */}
+      {/* Windows - warm amber glow */}
       {Array.from({ length: windows }).map((_, i) => (
         <div key={i} style={{
           position: 'absolute',
           top: 12 + i * 24,
           left: '50%', transform: 'translateX(-50%)',
           width: 10, height: 14,
-          background: 'rgba(200,160,255,0.5)',
-          border: `1px solid ${accent}`,
-          boxShadow: `0 0 4px rgba(180,120,255,0.4)`,
+          background: 'rgba(255,230,180,0.6)',
+          border: `1px solid rgba(255,210,120,0.5)`,
+          boxShadow: `0 0 6px rgba(255,220,150,0.5)`,
         }}>
           <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 1, height: '100%', background: accent, opacity: 0.5 }} />
           <div style={{ position: 'absolute', top: '50%', left: 0, transform: 'translateY(-50%)', width: '100%', height: 1, background: accent, opacity: 0.5 }} />
@@ -266,29 +265,29 @@ function EnchantedTree({ x, bottom, size = 1 }) {
         background: '#246830',
         clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
       }} />
-      {/* Magic glow */}
+      {/* Magic glow - soft warm tint */}
       <div style={{
         position: 'absolute', top: Math.round(8 * s), left: Math.round(8 * s),
         width: Math.round(16 * s), height: Math.round(16 * s),
-        background: 'radial-gradient(circle, rgba(100,200,120,0.25) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(200,180,120,0.2) 0%, transparent 70%)',
         borderRadius: '50%',
       }} />
-      {/* Glowing orbs */}
+      {/* Glowing orbs - warm amber */}
       <div style={{
         position: 'absolute', top: Math.round(18 * s), left: Math.round(6 * s),
         width: Math.round(4 * s), height: Math.round(4 * s),
-        background: '#80e060',
+        background: '#e8c860',
         borderRadius: '50%',
-        boxShadow: `0 0 ${Math.round(4 * s)}px #80e060`,
-        opacity: 0.8,
+        boxShadow: `0 0 ${Math.round(4 * s)}px rgba(232,200,96,0.8)`,
+        opacity: 0.85,
       }} />
       <div style={{
         position: 'absolute', top: Math.round(22 * s), left: Math.round(22 * s),
         width: Math.round(3 * s), height: Math.round(3 * s),
-        background: '#a0f080',
+        background: '#f0d878',
         borderRadius: '50%',
-        boxShadow: `0 0 ${Math.round(3 * s)}px #a0f080`,
-        opacity: 0.7,
+        boxShadow: `0 0 ${Math.round(3 * s)}px rgba(240,216,120,0.7)`,
+        opacity: 0.75,
       }} />
     </div>
   );

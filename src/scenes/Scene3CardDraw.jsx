@@ -7,7 +7,7 @@ import { drawRandomCard } from '../data/tarotCards';
 import { oracleReading } from '../services/geminiService';
 import { playCardDraw } from '../utils/sound';
 
-// phases: table → (user draws card + rolls coins) → loading → card-reveal → verdict → answer → hook → done
+// phases: table → loading → card-reveal → verdict → answer → hook → done
 
 export default function Scene3CardDraw({ question, onNext }) {
   const [phase, setPhase] = useState('table');
@@ -102,10 +102,10 @@ export default function Scene3CardDraw({ question, onNext }) {
 
       {/* Title */}
       <div style={{ textAlign: 'center', marginBottom: 4 }}>
-        <div style={{ fontSize: '9px', color: 'rgba(197,163,245,0.5)', fontFamily: "'Press Start 2P'", letterSpacing: 3, marginBottom: 4 }}>
+        <div style={{ fontSize: '14px', color: 'rgba(197,163,245,0.7)', fontFamily: "'Outfit', sans-serif", fontWeight: 600, letterSpacing: 2, marginBottom: 6 }}>
           ✦ 오늘의 점괘 ✦
         </div>
-        <div style={{ fontSize: '10px', color: 'rgba(180,140,220,0.85)', fontFamily: "'Press Start 2P'", lineHeight: 1.8 }}>
+        <div style={{ fontSize: '14px', color: 'rgba(220,200,255,0.95)', fontFamily: "'Outfit', sans-serif", lineHeight: 1.6 }}>
           "{question}"
         </div>
       </div>
@@ -122,7 +122,7 @@ export default function Scene3CardDraw({ question, onNext }) {
             marginBottom: 16,
             letterSpacing: 1,
           }}>
-            카드를 뽑고 동전을 6번 던져주세요
+            카드 뽑고 동전 6번 던져줘. 그러면 읽어줄게.
           </div>
 
           {/* Two-column grid — equal width */}
@@ -187,19 +187,19 @@ export default function Scene3CardDraw({ question, onNext }) {
           <div style={{
             display: 'flex', justifyContent: 'space-around',
             marginTop: 14,
-            fontFamily: "'Press Start 2P'", fontSize: '7px',
+            fontFamily: "'Outfit', sans-serif", fontSize: '13px', fontWeight: 600,
           }}>
-            <span style={{ color: cardDrawn ? '#5a9e3a' : 'rgba(255,255,255,0.2)' }}>
+            <span style={{ color: cardDrawn ? '#6bc96b' : 'rgba(255,255,255,0.35)' }}>
               {cardDrawn ? '✓ 카드 완료' : '○ 카드 대기'}
             </span>
-            <span style={{ color: hexagramDone ? '#5a9e3a' : 'rgba(255,255,255,0.2)' }}>
+            <span style={{ color: hexagramDone ? '#6bc96b' : 'rgba(255,255,255,0.35)' }}>
               {hexagramDone ? '✓ 주역 완료' : '○ 주역 대기'}
             </span>
           </div>
         </OracleTable>
       )}
 
-      {/* LOADING phase (brief, after both ready) */}
+      {/* LOADING phase */}
       {phase === 'loading' && (
         <OracleTable>
           <OracleLoadingPhase card={card} />
@@ -226,9 +226,9 @@ export default function Scene3CardDraw({ question, onNext }) {
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <HexagramDisplay lines={hexLines} />
-              <div style={{ fontFamily: "'Press Start 2P'", fontSize: '11px', color: '#d4b8f0', textAlign: 'center', lineHeight: 1.8, maxWidth: 130 }}>
-                <div style={{ color: '#e8c040', marginBottom: 2 }}>{hexagram.korName}</div>
-                <div style={{ fontSize: '9px', color: 'rgba(220,190,255,0.9)' }}>
+              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '14px', color: '#d4b8f0', textAlign: 'center', lineHeight: 1.6, maxWidth: 140 }}>
+                <div style={{ fontWeight: 600, color: '#e8c040', marginBottom: 4 }}>{hexagram.korName}</div>
+                <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(230,210,255,0.95)' }}>
                   {hexagram.description}
                 </div>
               </div>
@@ -252,13 +252,13 @@ export default function Scene3CardDraw({ question, onNext }) {
                 {verdict || '?'}
               </div>
               <div style={{
-                fontFamily: "'Press Start 2P'", fontSize: '10px',
+                fontFamily: "'Outfit', sans-serif", fontSize: '15px', fontWeight: 600,
                 color: isGil ? '#e8c040' : '#c08080',
-                letterSpacing: 2,
+                letterSpacing: 0.5,
                 border: `2px solid ${isGil ? '#e8c040' : '#c06060'}`,
-                padding: '8px 14px',
+                padding: '12px 18px',
                 background: isGil ? 'rgba(232,192,64,0.08)' : 'rgba(192,96,96,0.08)',
-                maxWidth: 320,
+                maxWidth: 340,
                 textAlign: 'center',
                 lineHeight: 1.6,
               }}>
@@ -304,11 +304,11 @@ export default function Scene3CardDraw({ question, onNext }) {
                 </div>
               )}
               <button
-                className="pixel-btn gold"
+                className="pixel-btn"
                 onClick={handleProceed}
-                style={{ fontSize: '12px', padding: '12px 24px' }}
+                style={{ fontSize: '11px', padding: '10px 22px' }}
               >
-                더 깊이 들어가볼래? ▶
+                ↩ 새 질문 하기
               </button>
             </div>
           )}
@@ -374,6 +374,7 @@ function OracleLoadingPhase({ card }) {
     </div>
   );
 }
+
 
 function VerdictTimer({ onDone }) {
   React.useEffect(() => {

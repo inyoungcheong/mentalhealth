@@ -1,8 +1,67 @@
-const { onCall } = require('firebase-functions/v2/https');
+const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { GoogleGenAI } = require('@google/genai');
 const { defineSecret } = require('firebase-functions/params');
+const admin = require('firebase-admin');
+
+admin.initializeApp();
+const db = admin.firestore();
 
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
+
+// ── 루나 시스템 ────────────────────────────────────────────────────────────
+
+// 첫 로그인 시 3루나 지급. 재방문 시 lastVisitAt 업데이트 후 이전 방문 시각 반환.
+exports.initUserIfNeeded = onCall({ region: 'asia-northeast3' }, async (req) => {
+  const uid = req.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', '로그인 필요');
+  const ref = db.collection('users').doc(uid);
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  const snap = await ref.get();
+  if (!snap.exists) {
+    await ref.set({ lua: 3, createdAt: now, lastVisitAt: now });
+    return { lua: 3, isNew: true, lastVisitAt: null };
+  }
+  const data = snap.data();
+  const prevLastVisitAt = data.lastVisitAt?.toDate?.()?.toISOString() ?? null;
+  await ref.update({ lastVisitAt: now });
+  return { lua: data.lua ?? 0, isNew: false, lastVisitAt: prevLastVisitAt };
+});
+
+// 루나 차감. amount 만큼 차감 (기본 1). 잔액 부족 시 에러.
+exports.spendLua = onCall({ region: 'asia-northeast3' }, async (req) => {
+  const uid = req.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', '로그인 필요');
+  const amount = typeof req.data?.amount === 'number' ? req.data.amount : 1;
+  const ref = db.collection('users').doc(uid);
+  const result = await db.runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    const lua = snap.data()?.lua ?? 0;
+    if (lua < amount) throw new HttpsError('failed-precondition', '루나 부족');
+    tx.update(ref, { lua: lua - amount });
+    return { lua: lua - amount };
+  });
+  return result;
+});
+
+// 하루 1회 무료 오라클 체크 + 사용 기록 (KST 기준)
+exports.checkDailyOracle = onCall({ region: 'asia-northeast3' }, async (req) => {
+  const uid = req.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', '로그인 필요');
+
+  const kstDate = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const todayKST = kstDate.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+
+  const ref = db.collection('users').doc(uid);
+  const snap = await ref.get();
+  const data = snap.data() || {};
+
+  if (data.lastOracleDate === todayKST) {
+    return { allowed: false };
+  }
+
+  await ref.update({ lastOracleDate: todayKST });
+  return { allowed: true };
+});
 
 const MODEL = 'gemini-2.5-flash';
 
@@ -37,7 +96,7 @@ const ORACLE_SYSTEM = `당신은 타로와 주역으로 점을 보는 점쟁이�
 - 질문 속의 더 깊은 문제를 꿰뚫어 본다
 
 말투:
-- 단호하고 직접적. "됩니다", "안됩니다", "됩니다만" 같은 확언 사용.
+- 단호하고 직접적. 질문이 됩니까/안됩니까에 맞으면 "됩니다", "안됩니다" 사용. 맞지 않으면(예: 무슨 색, 어떤 방향) 질문 형식에 맞게 답함.
 - 반말 사용.
 - 과장 없이 사실만. 하지만 깊이 꿰뚫어 보는 눈.
 - 한국어로만 응답.`;
@@ -77,8 +136,9 @@ exports.oracleReading = onCall({ region: 'asia-northeast3', secrets: [geminiApiK
 "길" 또는 "흉" 중 하나만. 반드시 카드와 괘 모두를 반영해서.
 
 [됩니까/안됩니까]
-질문에 대한 결론을 1~2문장으로 구체적으로. 
-예: "됩니다. 다만 지금은 서두르지 않는 게 좋아.", "안됩니다. 지금은 ~가 더 우선이야.", "가능해. 조금만 인내하면 돼.", "됩니다. 다만 ~한 점을 주의해야 해."
+질문에 대한 결론을 1~2문장으로 구체적으로.
+- 됩니다/안됩니다가 맞는 질문(예: 성공할까, 될까): "됩니다. 다만 ~", "안됩니다. 지금은 ~가 더 우선이야." 등
+- 그렇지 않은 질문(예: 무슨 색이 좋을까, 어떤 방향이 나을까): 질문 형식에 맞게 답해. "~가 더 어울려.", "지금은 A보다 B가 나아." 등. 됩니까/안됩니까를 억지로 쓰지 말 것.
 
 [직접 답변]
 반드시 질문("${question}")에 직접 답할 것. 카드와 괘의 구체적 에너지를 연결해서. 2-3문장. 
@@ -93,7 +153,7 @@ exports.oracleReading = onCall({ region: 'asia-northeast3', secrets: [geminiApiK
 응답 형식(JSON만, 다른 텍스트 없이):
 {
   "verdict": "길 또는 흉",
-  "verdictText": "구체적 1~2문장 (예: 됩니다. 다만 서두르지 마라.)",
+  "verdictText": "질문에 맞는 결론 1~2문장. 됩니까/안됩니까가 어울리면 그렇게, 아니면 질문 형식에 맞게.",
   "answer": "직접 답변 2-3문장",
   "coreIssue": "핵심 문제 한 문장",
   "deeperHook": "루나의 초대 2문장"
@@ -174,10 +234,14 @@ exports.recommendSpread = onCall({ region: 'asia-northeast3', secrets: [geminiAp
 
 // Step 6: 스프레드 카드별 해석 — buildup 방식 (이전 답변 직접 연결)
 exports.readCard = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }, async (req) => {
-  const { position, positionLabel, card, previousContext, question, coreIssue, allAnswers } = req.data;
+  const { position, positionLabel, card, previousContext, question, coreIssue, allAnswers, oracleAnswer } = req.data;
 
   const coreIssueStr = coreIssue
     ? `\n초기 점괘에서 포착된 핵심 문제: "${coreIssue}"`
+    : '';
+
+  const oracleAnswerStr = oracleAnswer
+    ? `\n오라클 초기 판정 (점쟁이가 같은 질문에 먼저 답한 것): "${oracleAnswer}"\n아이라는 이 판정을 알고 있으며, 더 깊은 층위로 파고든다.`
     : '';
 
   const prevCardsStr = previousContext && previousContext.length > 0
@@ -209,7 +273,7 @@ exports.readCard = onCall({ region: 'asia-northeast3', secrets: [geminiApiKey] }
     : '';
 
   const prompt = `
-질문: "${question}"${coreIssueStr}
+질문: "${question}"${coreIssueStr}${oracleAnswerStr}
 
 현재 위치: ${positionLabel} (${position + 1}번째 카드)
 카드: ${card.korName} / 뽑힌 방향: ${card.isReversed ? '역방향' : '정방향'}
@@ -226,13 +290,15 @@ ${reversedNoteStr}${depthStr}${prevCardsStr}${prevAnswersStr}
 5. "지금 ~이 작동하고 있어", "이 카드는 ~을 보여줘" 형식
 120자 이내.
 
-[탐구 질문] — 반드시 지켜야 할 규칙:
-1. 자연스럽고 누구나 의미를 이해하기 쉬운 완성된 한 문장. 뚝 끊기지 않는 대화체. 
-2. 카드의 의미와 유저의 context를 두루 살피되 지나치게 여러 번의 전환이 들어가서 문장을 이해하기 어렵게 하지 말 것. 
-2. 유저가 이전 답변에서 말한 구체적인 단어나 상황을 직접 언급할 것 (있는 경우)
-4. 유저가 경험한 차별, 부당함, 불공정은 사실로 받아들일 것. "혹시 과장 아닐까?", "네가 오해한 거 아닐까?" 식의 질문 절대 금지. 그 경험을 어떻게 내면화하거나 대처하는지에 집중.
-5. 유저가 느끼는 기대나 불안감이나 혼란의 원인을 파고들 것.
-60자 이내.
+[탐구 질문]
+목표: 이 카드의 에너지가 유저의 삶 어디에서 살아있는지, 유저가 스스로 발견할 수 있는 질문. 정답 없는 내면 탐구.
+형식: 반말 직접 의문형 하나. "~야?", "~어?", "~아?" 어미. 60자 이내.
+내용 규칙:
+- 이 카드가 드러내는 에너지 하나에 집중. 두 가지 이상의 의미를 한 문장에 담지 말 것.
+- 유저의 두려움/저항/욕망/혼란 중 이 카드가 가장 직접 가리키는 하나를 파고들 것.
+- 유저 이전 답변에서 나온 구체적 단어/상황을 직접 언급할 것 (있는 경우).
+- 유저 경험의 부당함을 의심하는 방향 절대 금지.
+형식 금지: 두 절 이어붙이기, 카드 키워드 따옴표 인용, "~것 같니?·~게 되지 않을까?" 등 복합 우회형 어미.
 
 [답변 스타터 제안] — 반드시 지켜야 할 규칙:
 1. 위 탐구 질문에 답하기 위해 자연스럽게 타이핑을 시작할 수 있는 짧은 문구 정확히 3개

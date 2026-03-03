@@ -95,9 +95,9 @@ function buildGreeting(dest, isNew) {
 
 // ── Map geometry ──────────────────────────────────────────────────────────────
 // Character positions (% of map area) — calibrated to background.png cobblestone paths
-const AIRA_POS  = { x: 20, y: 35 };   // in front of left house entrance
-const GRAY_POS  = { x: 46, y: 56 };   // at tarot table (on vertical path, below fork)
-const START_POS = { x: 46, y: 80 };   // bottom of vertical cobblestone path
+const AIRA_POS  = { x: 18, y: 32 };   // in front of left house entrance
+const GRAY_POS  = { x: 48, y: 60 };   // at tarot table (on vertical path, below fork) — moved right to avoid table overlap
+const START_POS = { x: 48, y: 82 };   // bottom of vertical cobblestone path
 
 // Road axes — calibrated to background.png T-junction layout
 const FORK_Y   = 47;    // y% where vertical path meets horizontal bar
@@ -468,7 +468,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
       {/* ══════ VN DIALOG PANEL — absolute overlay ══════ */}
       {isDialogOpen && (
         <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: '46%',
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
           zIndex: 20,
           background: destination === 'gray'
             ? 'linear-gradient(180deg, rgba(8,14,26,0.99) 0%, rgba(3,6,16,0.99) 100%)'

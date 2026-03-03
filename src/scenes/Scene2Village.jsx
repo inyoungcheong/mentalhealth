@@ -151,7 +151,7 @@ export default function Scene2Village({ isNew, lastVisitAt, onNext }) {
           bottom: 28,
           left: childX,
           transform: 'scale(2)',
-          transformOrigin: 'bottom left',
+          transformOrigin: 'bottom center',
           imageRendering: 'pixelated',
           transition: isWalking ? 'left 2.5s linear' : 'none',
         }}>
@@ -162,9 +162,9 @@ export default function Scene2Village({ isNew, lastVisitAt, onNext }) {
         {phase !== 'walking' && (
           <div style={{
             position: 'absolute',
-            bottom: 26,
-            right: 80,
-            transform: 'scale(2) scaleX(-1)',
+            bottom: 28,
+            right: 100,
+            transform: 'scale(2)',
             transformOrigin: 'bottom right',
             imageRendering: 'pixelated',
             opacity: phase === 'witch-appear' ? 0 : 1,
@@ -195,14 +195,19 @@ export default function Scene2Village({ isNew, lastVisitAt, onNext }) {
         {/* Question input */}
         {showInput && (
           <div style={{
-            position: 'absolute',
-            bottom: 40,
-            left: '50%', transform: 'translateX(-50%)',
-            width: 'min(90%, 600px)',
-            background: 'rgba(255,255,255,0.97)',
-            border: '2px solid #6b2d8b',
-            padding: '16px 18px',
-            boxShadow: '4px 4px 0 rgba(0,0,0,0.3)',
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: '100%',
+            background: 'rgba(255,255,255,0.98)',
+            border: '3px solid #6b2d8b',
+            borderBottom: 'none',
+            padding: '20px 24px',
+            boxShadow: '0 -4px 12px rgba(0,0,0,0.4)',
+            maxHeight: '50vh',
+            overflowY: 'auto',
+            zIndex: 1000,
           }}>
             <div style={{
               fontFamily: "'Press Start 2P'", fontSize: '11px',

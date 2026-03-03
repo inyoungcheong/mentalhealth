@@ -146,6 +146,21 @@ export default function PixelVillage({ children, style = {} }) {
         pointerEvents: 'none',
       }} />
 
+      {/* ===== SMOKE / MIST PARTICLES ===== */}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div key={`smoke-${i}`} style={{
+          position: 'absolute',
+          left: `${15 + i * 18}%`,
+          bottom: `${25 + (i % 2) * 8}%`,
+          width: `${40 + (i % 3) * 20}px`,
+          height: `${30 + (i % 3) * 15}px`,
+          background: `radial-gradient(ellipse, rgba(120,140,160,0.3) 0%, transparent 70%)`,
+          borderRadius: '50%',
+          animation: `smoke ${4 + i * 0.8}s ease-in-out infinite ${i * 0.6}s`,
+          pointerEvents: 'none',
+        }} />
+      ))}
+
       {/* ===== FIREFLIES (cooler tint) ===== */}
       {[60, 140, 280, 400].map((fx, i) => (
         <div key={i} style={{
@@ -156,6 +171,21 @@ export default function PixelVillage({ children, style = {} }) {
           borderRadius: '50%',
           boxShadow: '0 0 6px rgba(220,240,180,0.7)',
           animation: `firefly ${2 + i * 0.5}s ease-in-out infinite ${i * 0.7}s`,
+        }} />
+      ))}
+
+      {/* ===== ADDITIONAL FIRE GLOW EFFECTS ===== */}
+      {[25, 50, 75].map((x, i) => (
+        <div key={`fire-glow-${i}`} style={{
+          position: 'absolute',
+          left: `${x}%`,
+          bottom: '8%',
+          width: '60px',
+          height: '80px',
+          background: `radial-gradient(ellipse at center, rgba(255,140,60,0.15) 0%, transparent 60%)`,
+          borderRadius: '50%',
+          animation: `fireGlow ${3 + i * 0.5}s ease-in-out infinite ${i * 0.4}s`,
+          pointerEvents: 'none',
         }} />
       ))}
 
@@ -175,6 +205,16 @@ export default function PixelVillage({ children, style = {} }) {
         @keyframes lanternGlow {
           0%, 100% { box-shadow: 0 0 8px rgba(255,200,80,0.6), 0 0 16px rgba(255,160,40,0.3); }
           50% { box-shadow: 0 0 14px rgba(255,200,80,0.9), 0 0 28px rgba(255,160,40,0.5); }
+        }
+        @keyframes smoke {
+          0% { transform: translateY(0px) translateX(0px); opacity: 0; }
+          25% { opacity: 0.3; }
+          50% { transform: translateY(30px) translateX(15px); opacity: 0.2; }
+          100% { transform: translateY(60px) translateX(0px); opacity: 0; }
+        }
+        @keyframes fireGlow {
+          0%, 100% { opacity: 0.1; transform: scale(0.9); }
+          50% { opacity: 0.25; transform: scale(1.1); }
         }
       `}</style>
     </div>

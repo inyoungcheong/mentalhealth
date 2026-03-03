@@ -18,3 +18,9 @@ export async function spendLua(amount = 1) {
   const result = await fn({ amount });
   return result.data; // { lua: number }
 }
+
+export async function useOracleToday() {
+  const fn = httpsCallable(functions, 'useOracleToday');
+  const result = await fn({});
+  return result.data; // { recorded: boolean }
+}

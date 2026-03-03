@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import { createSession, saveInitialReading, saveSpreadSelection } from './services/firestoreService';
+import { spendLua } from './services/luaService';
 
 import LunaHUD from './components/LunaHUD';
 import Scene1Intro from './scenes/Scene1Intro';
 import Scene2Village from './scenes/Scene2Village';
 import Scene3CardDraw from './scenes/Scene3CardDraw';
 import SceneTierSelect from './scenes/SceneTierSelect';
+import SceneMap from './scenes/SceneMap';
 import Scene6Reading from './scenes/Scene6Reading';
 import Scene7Report from './scenes/Scene7Report';
 import ReportPage from './scenes/ReportPage';
@@ -22,7 +24,7 @@ function getReportId() {
 }
 
 export default function App() {
-  const [scene, setScene] = useState('intro'); // intro | village | tier-select | card-draw | reading | report
+  const [scene, setScene] = useState('intro'); // intro | map | village | tier-select | tier-select-paid | card-draw | reading | report
   const [user, setUser] = useState(null);
   const [authLoaded, setAuthLoaded] = useState(false);
   const [sessionId, setSessionId] = useState(null);
@@ -71,12 +73,31 @@ export default function App() {
     } else {
       setLuaBalance(lua ?? 0);
     }
-    setScene('village');
+    setScene('map');
   }
 
   async function handleVillageNext(q) {
     setQuestion(q);
     setScene('tier-select');
+  }
+
+  async function handleMapNext({ destination, question: q, useFree }) {
+    setQuestion(q);
+    if (destination === 'gray') {
+      // Paid oracle: deduct 1 luna before proceeding
+      if (!useFree && user) {
+        try {
+          const { lua } = await spendLua(1);
+          setLuaBalance(lua);
+        } catch (err) {
+          console.error('Lua spend error (oracle):', err);
+        }
+      }
+      setScene('card-draw');
+    } else {
+      // aira → paid-only tier select
+      setScene('tier-select-paid');
+    }
   }
 
   async function handleTierNext({ tier }) {
@@ -111,7 +132,24 @@ export default function App() {
     setInterpretation(answer || '');
     setCoreIssue(issue || '');
     setDeeperHook(hook || '');
-    setScene('village');
+    setScene('map');
+  }
+
+  async function handleLogout() {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+    setScene('intro');
+    setSessionId(null);
+    setQuestion('');
+    setInitialCard(null);
+    setInterpretation('');
+    setCoreIssue('');
+    setDeeperHook('');
+    setSpreadInfo(null);
+    setFinalCards([]);
   }
 
   async function handleReadingNext({ cards }) {
@@ -121,8 +159,10 @@ export default function App() {
 
   const sceneComponents = {
     intro: <Scene1Intro user={user} authLoaded={authLoaded} onNext={handleIntroNext} />,
+    map: <SceneMap isNew={isNewUser} lastVisitAt={lastVisitAt} luaBalance={luaBalance} onNext={handleMapNext} />,
     village: <Scene2Village isNew={isNewUser} lastVisitAt={lastVisitAt} onNext={handleVillageNext} />,
     'tier-select': <SceneTierSelect question={question} luaBalance={luaBalance} onNext={handleTierNext} onLuaSpent={setLuaBalance} />,
+    'tier-select-paid': <SceneTierSelect question={question} luaBalance={luaBalance} mode="paid-only" onNext={handleTierNext} onLuaSpent={setLuaBalance} />,
     'card-draw': <Scene3CardDraw question={question} onNext={handleCardDrawNext} />,
     reading: spreadInfo ? (
       <Scene6Reading
@@ -150,7 +190,7 @@ export default function App() {
 
   return (
     <div className="game-viewport">
-      <LunaHUD balance={luaBalance} />
+      <LunaHUD balance={luaBalance} onLogout={handleLogout} />
       <div className="game-screen" style={{
         overflowY: 'auto', position: 'relative',
       }}>
@@ -172,7 +212,7 @@ export default function App() {
             display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end',
             zIndex: 9999,
           }}>
-            {['intro','village','tier-select','card-draw','reading','report'].map(s => (
+            {['intro','map','village','tier-select','tier-select-paid','card-draw','reading','report'].map(s => (
               <button
                 key={s}
                 onClick={() => setScene(s)}

@@ -307,12 +307,13 @@ export default function Scene6Reading({ sessionId, question, coreIssue, oracleAn
 
           {/* Answer textarea */}
           <textarea
+            className="input-typing"
             value={userAnswer}
             onChange={e => setUserAnswer(e.target.value)}
             placeholder="솔직하게 답해봐..."
             autoFocus
             style={{
-              fontFamily: "'Press Start 2P'", fontSize: '8px',
+              fontSize: '14px',
               background: 'rgba(27,10,46,0.8)', border: '1px solid #6b2d8b',
               color: '#f0e6ff', padding: '10px', resize: 'none', height: 80,
               outline: 'none', lineHeight: 1.8, width: '100%',

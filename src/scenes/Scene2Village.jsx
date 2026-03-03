@@ -241,7 +241,7 @@ export default function Scene2Village({ isNew, lastVisitAt, onNext }) {
                 placeholder="여기에 입력... (Shift+Enter로 줄바꿈)"
                 autoFocus
                 rows={3}
-                style={{ flex: 1, fontSize: '12px', resize: 'none', lineHeight: 1.8 }}
+                style={{ flex: 1, fontSize: '15px', resize: 'none', lineHeight: 1.8 }}
               />
               <button
                 className="pixel-btn"

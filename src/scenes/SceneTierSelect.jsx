@@ -28,7 +28,7 @@ const TIERS = [
   },
 ];
 
-export default function SceneTierSelect({ question, luaBalance, onNext, onLuaSpent }) {
+export default function SceneTierSelect({ question, luaBalance, onNext, onLuaSpent, mode = 'all' }) {
   const [oracleChecking, setOracleChecking] = useState(true);
   const [oracleAvailable, setOracleAvailable] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -74,9 +74,13 @@ export default function SceneTierSelect({ question, luaBalance, onNext, onLuaSpe
     }
   }
 
+  const visibleTiers = mode === 'paid-only'
+    ? TIERS.filter(t => t.cost > 0)
+    : TIERS;
+
   const font = "'Press Start 2P'";
 
-  if (oracleChecking) {
+  if (oracleChecking && mode !== 'paid-only') {
     return (
       <div style={{
         width: '100%', height: '100%',
@@ -115,7 +119,7 @@ export default function SceneTierSelect({ question, luaBalance, onNext, onLuaSpe
 
       {/* Tier cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 400 }}>
-        {TIERS.map(tier => {
+        {visibleTiers.map(tier => {
           const enabled = isEnabled(tier);
           const isSelected = selected === tier.key;
           return (

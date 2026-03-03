@@ -45,7 +45,7 @@ export default function ChatBubble({ text, speaker = 'witch', onDone, autoType =
       border: `2px solid ${c.border}`,
       borderRadius: 6,
       fontFamily: "'Outfit', sans-serif",
-      fontSize: '16px',
+      fontSize: '13px',
       fontWeight: 500,
       lineHeight: '1.8',
       letterSpacing: '0.01em',

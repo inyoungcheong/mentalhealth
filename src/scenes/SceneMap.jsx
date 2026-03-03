@@ -94,51 +94,53 @@ function buildGreeting(dest, isNew) {
 }
 
 // ── Map geometry ──────────────────────────────────────────────────────────────
-// Character positions (% of map area) — spread apart to avoid overlap
-const AIRA_POS  = { x: 14, y: 14 };   // top-left, in front of house
-const GRAY_POS  = { x: 38, y: 46 };   // center — on main path, away from Aira
-const START_POS = { x: 42, y: 78 };   // bottom-center, in starting area
+// Character positions (% of map area) — calibrated to background.png cobblestone paths
+const AIRA_POS  = { x: 20, y: 35 };   // in front of left house entrance
+const GRAY_POS  = { x: 46, y: 56 };   // at tarot table (on vertical path, below fork)
+const START_POS = { x: 46, y: 80 };   // bottom of vertical cobblestone path
 
-// Road axes — clearer path layout
-const FORK_Y   = 35;    // y% of horizontal fork road
-const LEFT_X   = 16;    // x% of left fork road (→ Aira)
-const RIGHT_X  = 72;    // x% of right fork road (→ Diary)
-const CENTER_X = 42;    // x% of center vertical road
+// Road axes — calibrated to background.png T-junction layout
+const FORK_Y   = 47;    // y% where vertical path meets horizontal bar
+const LEFT_X   = 16;    // x% of left branch end (→ Aira's house)
+const RIGHT_X  = 68;    // x% of right branch end (→ Diary house)
+const CENTER_X = 46;    // x% of center vertical stem
 
-// Diary position (top-right)
-const DIARY_POS = { x: 70, y: 16 };
+// Diary position (top-right house)
+const DIARY_POS = { x: 66, y: 26 };
 
-// Multi-step walk paths — all 4 destinations reachable
+// Multi-step walk paths — follow cobblestone roads
 const WALK_PATHS = {
+  // Gray: straight up the center path to tarot table
   gray: [
-    { x: 42, y: 48, dur: 700, face: -1 },
+    { x: CENTER_X, y: GRAY_POS.y, dur: 750, face: -1 },
   ],
+  // Aira: up center → left along horizontal bar → up to house
   aira: [
-    { x: CENTER_X,      y: FORK_Y,            dur: 500, face: -1 },
-    { x: LEFT_X,        y: FORK_Y,            dur: 550, face: -1 },
-    { x: LEFT_X + 7,    y: AIRA_POS.y + 6,    dur: 350, face: -1 },
+    { x: CENTER_X,       y: FORK_Y,            dur: 550, face: -1 },
+    { x: LEFT_X,         y: FORK_Y,            dur: 600, face: -1 },
+    { x: AIRA_POS.x + 2, y: AIRA_POS.y + 5,   dur: 400, face: -1 },
   ],
+  // Diary: up center → right along horizontal bar → up to house
   diary: [
-    { x: CENTER_X, y: FORK_Y,            dur: 500, face: 1 },
-    { x: RIGHT_X,  y: FORK_Y,            dur: 550, face: 1 },
-    { x: RIGHT_X,  y: DIARY_POS.y + 2,   dur: 400, face: 1 },
+    { x: CENTER_X,    y: FORK_Y,            dur: 550, face: 1 },
+    { x: RIGHT_X,     y: FORK_Y,            dur: 600, face: 1 },
+    { x: DIARY_POS.x, y: DIARY_POS.y + 4,  dur: 400, face: 1 },
   ],
+  // Home from center/table area: straight down
   home: [
-    { x: CENTER_X, y: 55,                dur: 500, face: 1 },
-    { x: START_POS.x, y: 68,            dur: 450, face: 1 },
-    { x: START_POS.x, y: START_POS.y,    dur: 400, face: 1 },
+    { x: CENTER_X,    y: START_POS.y,       dur: 750, face: 1 },
   ],
+  // Home from Aira's area: retrace left branch → center → down
   homeFromAira: [
-    { x: LEFT_X + 7,    y: FORK_Y,        dur: 500, face: 1 },
-    { x: CENTER_X,      y: FORK_Y,        dur: 550, face: 1 },
-    { x: CENTER_X,      y: 55,            dur: 500, face: 1 },
-    { x: START_POS.x,   y: START_POS.y,   dur: 500, face: 1 },
+    { x: LEFT_X,      y: FORK_Y,            dur: 500, face: 1 },
+    { x: CENTER_X,    y: FORK_Y,            dur: 600, face: 1 },
+    { x: CENTER_X,    y: START_POS.y,       dur: 700, face: 1 },
   ],
+  // Home from Diary: retrace right branch → center → down
   homeFromDiary: [
-    { x: RIGHT_X, y: FORK_Y,            dur: 400, face: -1 },
-    { x: CENTER_X, y: FORK_Y,           dur: 550, face: -1 },
-    { x: CENTER_X, y: 55,               dur: 500, face: 1 },
-    { x: START_POS.x, y: START_POS.y,    dur: 500, face: 1 },
+    { x: RIGHT_X,     y: FORK_Y,            dur: 400, face: -1 },
+    { x: CENTER_X,    y: FORK_Y,            dur: 600, face: -1 },
+    { x: CENTER_X,    y: START_POS.y,       dur: 700, face: 1 },
   ],
 };
 
@@ -192,8 +194,8 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
     let pathKey = dest;
     if (dest === 'home') {
       const px = protagonistPos.x, py = protagonistPos.y;
-      if (px < 25 && py < 30) pathKey = 'homeFromAira';
-      else if (px > 60 && py < 25) pathKey = 'homeFromDiary';
+      if (px < 30 && py < 48) pathKey = 'homeFromAira';
+      else if (px > 58 && py < 40) pathKey = 'homeFromDiary';
       else pathKey = 'home';
     }
     const steps = WALK_PATHS[pathKey];
@@ -309,7 +311,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
       {/* ══════ MAP AREA ══════ */}
       <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
 
-        {/* Toast message (diary "준비 중" etc.) */}
+        {/* Toast message */}
         {toastMessage && (
           <div style={{
             position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
@@ -320,60 +322,33 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
           }}>{toastMessage}</div>
         )}
 
-        {/* Layer 1 — Background sky */}
-        <div style={{ position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, #02000c 0%, #08021a 55%, #050c08 100%)' }} />
+        {/* ── Background image (background.png) ── */}
+        <MapBackground />
 
-        {/* Depth gradient — far(top) darker, near(bottom) slightly warmer */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 55%, rgba(18,28,12,0.25) 100%)',
-          zIndex: 1,
-        }} />
-
-        {/* Stars */}
+        {/* ── Animated stars over sky ── */}
         {STARS.map((s, i) => (
           <div key={i} style={{
             position: 'absolute', top: `${s.y}%`, left: `${s.x}%`,
             width: s.sz, height: s.sz, background: '#fff', borderRadius: '50%',
             opacity: s.op, animation: `starTwinkle ${s.dur}s ease-in-out infinite ${s.del}s`,
+            zIndex: 1, pointerEvents: 'none',
           }} />
         ))}
 
-        {/* Layer 2 — Terrain (dark grass) */}
-        {GRASS.map((g, i) => (
-          <div key={i} style={{ position: 'absolute',
-            top: `${g.y}%`, left: `${g.x}%`, width: `${g.w}%`, height: `${g.h}%`,
-            background: g.c }} />
-        ))}
-
-        {/* Border trees */}
-        {TREES.map((t, i) => <MutedTree key={i} x={t.x} y={t.y} s={t.s} />)}
-
-        {/* FX — ambient magical particles (z:3, between terrain and characters) */}
+        {/* ── Ambient magic particles (z:3) ── */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3 }}>
           {FX_PARTICLES.map((p, i) => (
             <div key={i} style={{
               position: 'absolute',
               top: `${p.y}%`, left: `${p.x}%`,
               width: p.sz, height: p.sz,
-              background: p.c,
-              borderRadius: '50%',
-              opacity: p.op,
+              background: p.c, borderRadius: '50%', opacity: p.op,
               animation: `fxDrift ${p.dur}s ease-in-out infinite ${p.del}s`,
               boxShadow: `0 0 ${p.sz * 2}px ${p.c}`,
             }} />
           ))}
         </div>
 
-        {/* Layer 3 — Stone roads (clear paths, no building overlap) */}
-        <StoneRoad x={CENTER_X - 2} y={FORK_Y + 3}  w={5}  h={48} />  {/* center vertical — main path */}
-        <StoneRoad x={10}           y={FORK_Y - 2}   w={62} h={6}  />  {/* horizontal fork */}
-        <StoneRoad x={LEFT_X - 2}   y={10}           w={5}  h={28} />  {/* left fork → Aira */}
-        <StoneRoad x={RIGHT_X - 2}  y={8}            w={5}  h={30} />  {/* right fork → Diary */}
-
-        {/* Starting area — path entrance, flowers, Luna cat */}
-        <StartingArea />
         {/* Home click overlay — return to start */}
         <div
           onClick={handleHomeClick}
@@ -385,24 +360,16 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
           }}
         />
 
-        {/* ── Aira's house (top-left) ── */}
-        <AiraHouse />
-
-        {/* ── Diary (top-right) ── */}
-        <DiaryBuilding />
         {/* Diary click overlay */}
         <div
           onClick={handleDiaryClick}
           title="일기장 (준비 중)"
           style={{
-            position: 'absolute', top: '2%', left: '74%', width: '24%', height: '24%',
+            position: 'absolute', top: '2%', left: '68%', width: '26%', height: '26%',
             cursor: !walking && dialogPhase === 'none' ? 'pointer' : 'default',
             zIndex: 6,
           }}
         />
-
-        {/* ── Gray's zone (right-center) ── */}
-        <GrayZone />
 
         {/* ── Aira character (clickable) ── */}
         <div
@@ -410,7 +377,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
           title="아이라 (유료 딥 리딩)"
           style={{
             position: 'absolute', top: `${AIRA_POS.y}%`, left: `${AIRA_POS.x}%`,
-            transform: 'scale(3.2) scaleX(-1)', transformOrigin: 'bottom center',
+            transform: 'scale(2.8) scaleX(-1)', transformOrigin: 'bottom center',
             imageRendering: 'pixelated',
             cursor: !walking && dialogPhase === 'none' ? 'pointer' : 'default',
             animation: 'airaIdle 1.4s ease-in-out infinite',
@@ -423,9 +390,9 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
           <ChibiWitchSprite />
         </div>
 
-        {/* Aira label */}
+        {/* Aira label — sprite is 44px × 2.8 scale */}
         <div style={{
-          position: 'absolute', top: `calc(${AIRA_POS.y}% + 86px)`, left: `${AIRA_POS.x - 2}%`,
+          position: 'absolute', top: `calc(${AIRA_POS.y}% + 38px)`, left: `${AIRA_POS.x - 2}%`,
           fontFamily: F, fontSize: '7px', color: '#c5a3f5',
           textAlign: 'center', whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 5,
         }}>
@@ -441,7 +408,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
         {!isDialogOpen && !walking && (
           <div style={{
             position: 'absolute',
-            top: `calc(${AIRA_POS.y}% + 100px)`, left: `${AIRA_POS.x}%`,
+            top: `calc(${AIRA_POS.y}% + 52px)`, left: `${AIRA_POS.x}%`,
             fontFamily: F, fontSize: '5px', color: '#5a2d7a',
             animation: 'hintBounce 0.9s ease-in-out infinite alternate',
             pointerEvents: 'none', zIndex: 5,
@@ -454,7 +421,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
           title="그레이 (무료 오늘의 점괘)"
           style={{
             position: 'absolute', top: `${GRAY_POS.y}%`, left: `${GRAY_POS.x}%`,
-            transform: 'scale(3.2)', transformOrigin: 'bottom center',
+            transform: 'scale(2.8)', transformOrigin: 'bottom center',
             imageRendering: 'pixelated',
             cursor: !walking && dialogPhase === 'none' ? 'pointer' : 'default',
             filter: destination === 'gray'
@@ -466,9 +433,9 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
           <ChibiGraySprite />
         </div>
 
-        {/* Gray label */}
+        {/* Gray label — sprite is 34px × 2.8 scale */}
         <div style={{
-          position: 'absolute', top: `calc(${GRAY_POS.y}% + 74px)`, left: `${GRAY_POS.x - 2}%`,
+          position: 'absolute', top: `calc(${GRAY_POS.y}% + 32px)`, left: `${GRAY_POS.x - 2}%`,
           fontFamily: F, fontSize: '7px', color: '#8aaabb',
           textAlign: 'center', whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 5,
         }}>
@@ -487,7 +454,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
         <div style={{
           position: 'absolute',
           top: `${protagonistPos.y}%`, left: `${protagonistPos.x}%`,
-          transform: `scale(3.0) scaleX(${facing})`, transformOrigin: 'bottom center',
+          transform: `scale(2.8) scaleX(${facing})`, transformOrigin: 'bottom center',
           imageRendering: 'pixelated',
           transition: walking
             ? `top ${protagonistDur}ms linear, left ${protagonistDur}ms linear`
@@ -542,17 +509,19 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
 
           {/* Portrait + content */}
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden', minHeight: 0 }}>
-            {/* Portrait */}
+            {/* Portrait — overflow:hidden crops to head+chest */}
             <div style={{
               width: 76, flexShrink: 0,
-              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-              padding: '0 0 10px 8px',
+              overflow: 'hidden',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+              paddingTop: 6,
               borderRight: '1px solid rgba(107,45,139,0.15)',
               background: destination === 'gray' ? 'rgba(14,22,36,0.7)' : 'rgba(10,4,26,0.7)',
             }}>
               <div style={{
-                transform: destination === 'gray' ? 'scale(1.6)' : 'scale(1.6) scaleX(-1)',
-                transformOrigin: 'bottom center', imageRendering: 'pixelated',
+                transform: destination === 'gray' ? 'scale(3.4)' : 'scale(3.4) scaleX(-1)',
+                transformOrigin: 'top center', imageRendering: 'pixelated',
+                flexShrink: 0,
               }}>
                 {destination === 'gray' ? <GraySprite /> : <WitchSprite />}
               </div>
@@ -684,8 +653,8 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
 
       <style>{`
         @keyframes airaIdle {
-          0%, 100% { transform: scale(1.8) scaleX(-1) translateY(0px); }
-          50%       { transform: scale(1.8) scaleX(-1) translateY(-4px); }
+          0%, 100% { transform: scale(2.8) scaleX(-1) translateY(0px); }
+          50%       { transform: scale(2.8) scaleX(-1) translateY(-3px); }
         }
         @keyframes starTwinkle {
           0%, 100% { opacity: 0.75; }
@@ -699,32 +668,6 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
           from { transform: translateY(0);    }
           to   { transform: translateY(-5px); }
         }
-        @keyframes candleFlicker {
-          from { opacity: 0.95; transform: scaleX(1)   scaleY(1);   }
-          to   { opacity: 0.6;  transform: scaleX(0.8) scaleY(1.2); }
-        }
-        @keyframes crystalPulse {
-          0%, 100% { opacity: 0.85; }
-          50%       { opacity: 0.4;  }
-        }
-        @keyframes diaryFloat {
-          0%, 100% { transform: translateY(0px); }
-          50%       { transform: translateY(-4px); }
-        }
-        @keyframes windowGlow {
-          0%, 100% { box-shadow: 0 0 22px rgba(140,60,200,0.75), inset 0 0 14px rgba(220,180,255,0.30); }
-          50%       { box-shadow: 0 0 38px rgba(160,80,220,0.95), inset 0 0 22px rgba(220,180,255,0.50); }
-        }
-        @keyframes lunaTailWag {
-          0%, 85%, 100% { transform: rotate(0deg); }
-          90% { transform: rotate(-25deg); }
-          92% { transform: rotate(20deg); }
-          95% { transform: rotate(-15deg); }
-        }
-        @keyframes lunaEarTwitch {
-          0%, 88%, 100% { transform: scaleY(1); }
-          90% { transform: scaleY(1.15); }
-        }
         @keyframes fxDrift {
           0%, 100% { transform: translateY(0px) translateX(0px); }
           33%       { transform: translateY(-8px) translateX(3px); }
@@ -735,245 +678,289 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
   );
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
-
-// Luna the cat — ivory, 1/3 protagonist size, tail wag + ear twitch
-function LunaCat() {
-  const ivory = '#f0ebe0';
-  const ivoryShadow = '#e0d8c8';
-  const ivoryDark = '#d8d0c0';
-  const F = "'Press Start 2P'";
+// ── Map Background (background.png) ────────────────────────────────────────────
+function MapBackground() {
   return (
-    <div style={{
-      position: 'absolute', bottom: '20%', left: '28%',
-      transform: 'scale(1.0)', transformOrigin: 'bottom center',
-      imageRendering: 'pixelated', zIndex: 4, pointerEvents: 'none',
-    }}>
-      <div style={{ position: 'relative', width: 12, height: 14 }}>
-        {/* Ears — twitch animation */}
-        <div style={{
-          position: 'absolute', top: 0, left: 1, width: 3, height: 4,
-          background: ivory, clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-          transformOrigin: 'bottom center',
-          animation: 'lunaEarTwitch 4.2s ease-in-out infinite 0.3s',
-        }} />
-        <div style={{
-          position: 'absolute', top: 0, right: 1, width: 3, height: 4,
-          background: ivory, clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-          transformOrigin: 'bottom center',
-          animation: 'lunaEarTwitch 4.2s ease-in-out infinite 0.8s',
-        }} />
-        {/* Head */}
-        <div style={{ position: 'absolute', top: 2, left: 2, width: 8, height: 6, background: ivory, borderRadius: '50% 50% 40% 40%' }} />
-        <div style={{ position: 'absolute', top: 3, left: 3, width: 2, height: 2, background: '#2a1a08', borderRadius: 1 }} />
-        <div style={{ position: 'absolute', top: 3, right: 3, width: 2, height: 2, background: '#2a1a08', borderRadius: 1 }} />
-        <div style={{ position: 'absolute', top: 3, left: 4, width: 1, height: 1, background: '#fff', opacity: 0.8 }} />
-        <div style={{ position: 'absolute', top: 3, right: 4, width: 1, height: 1, background: '#fff', opacity: 0.8 }} />
-        {/* Body */}
-        <div style={{ position: 'absolute', top: 7, left: 3, width: 6, height: 5, background: ivoryShadow, borderRadius: '40% 40% 50% 50%' }} />
-        {/* Tail — wag animation */}
-        <div style={{
-          position: 'absolute', top: 9, right: -2, width: 4, height: 3,
-          background: ivoryDark, borderRadius: '0 50% 50% 0',
-          transformOrigin: 'left center',
-          animation: 'lunaTailWag 3.5s ease-in-out infinite 1.2s',
-        }} />
-      </div>
-      <div style={{ position: 'absolute', bottom: -10, left: '50%', transform: 'translateX(-50%)', fontFamily: F, fontSize: '5px', color: '#c5a3f5', whiteSpace: 'nowrap' }}>루나</div>
-    </div>
+    <img
+      src="/intro/background.png"
+      alt=""
+      style={{
+        position: 'absolute', inset: 0, zIndex: 0,
+        width: '100%', height: '100%',
+        objectFit: 'cover',
+        objectPosition: 'center center',
+        imageRendering: 'pixelated',
+        display: 'block',
+      }}
+    />
   );
 }
 
-function StartingArea() {
+// ── Village SVG (legacy — kept for reference, not rendered) ───────────────────
+function VillageSVG_DEPRECATED() {
   return (
-    <>
-      {/* Path entrance stones — bottom center */}
-      <div style={{ position: 'absolute', bottom: '18%', left: '39%', width: '8%', height: '3%', background: '#2a2848', border: '1px solid #3e3a60', borderRadius: 2, zIndex: 2 }} />
-      <div style={{ position: 'absolute', bottom: '16%', left: '41%', width: '6%', height: '2%', background: '#323050', border: '1px solid #4a4668', borderRadius: 2, zIndex: 2 }} />
-      {/* Small flowers by path */}
-      <div style={{ position: 'absolute', bottom: '20%', left: '34%', width: 6, height: 6, background: '#8a4a6a', borderRadius: '50%', border: '1px solid #6a3a52', zIndex: 3 }} />
-      <div style={{ position: 'absolute', bottom: '22%', right: '36%', width: 5, height: 5, background: '#6a5a9a', borderRadius: '50%', border: '1px solid #4a3a7a', zIndex: 3 }} />
-      {/* Luna the cat — ivory, 1/3 protagonist size, at start */}
-      <LunaCat />
-    </>
-  );
-}
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0 }}
+    >
+      <defs>
+        <linearGradient id="vSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#01000d" />
+          <stop offset="55%"  stopColor="#060118" />
+          <stop offset="100%" stopColor="#060e05" />
+        </linearGradient>
+        <linearGradient id="vDepth" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#000" stopOpacity="0.55" />
+          <stop offset="50%"  stopColor="#000" stopOpacity="0.08" />
+          <stop offset="100%" stopColor="#121c0c" stopOpacity="0.3" />
+        </linearGradient>
+        <radialGradient id="vMoonHalo" cx="50%" cy="9%" r="18%">
+          <stop offset="0%"   stopColor="#ddc8ff" stopOpacity="0.32" />
+          <stop offset="100%" stopColor="#ddc8ff" stopOpacity="0"   />
+        </radialGradient>
+        <radialGradient id="vWinGlow" cx="50%" cy="50%" r="60%">
+          <stop offset="0%"   stopColor="#e0b8ff" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#6020a8" stopOpacity="0.55" />
+        </radialGradient>
+        <radialGradient id="vLampGlow" cx="50%" cy="40%" r="60%">
+          <stop offset="0%"   stopColor="#ffe878" stopOpacity="0.65" />
+          <stop offset="100%" stopColor="#ff8800" stopOpacity="0"   />
+        </radialGradient>
+        <radialGradient id="vCandleGlow" cx="50%" cy="20%" r="55%">
+          <stop offset="0%"   stopColor="#ffe060" stopOpacity="0.75" />
+          <stop offset="100%" stopColor="#ff8000" stopOpacity="0"   />
+        </radialGradient>
+        <radialGradient id="vCrystalGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stopColor="#c080ff" stopOpacity="0.7" />
+          <stop offset="100%" stopColor="#6010a0" stopOpacity="0"   />
+        </radialGradient>
+      </defs>
 
-function StoneRoad({ x, y, w, h }) {
-  return (
-    <div style={{
-      position: 'absolute', top: `${y}%`, left: `${x}%`, width: `${w}%`, height: `${h}%`,
-      background: '#6868a4',
-      backgroundImage: `
-        repeating-linear-gradient(90deg, transparent 0%, transparent calc(16.6% - 1px), rgba(20,18,40,0.7) calc(16.6% - 1px), rgba(20,18,40,0.7) 16.6%),
-        repeating-linear-gradient(0deg,  transparent 0%, transparent calc(25%   - 1px), rgba(20,18,40,0.7) calc(25%   - 1px), rgba(20,18,40,0.7) 25%)
-      `,
-      borderTop: '1px solid #8888c0',
-      borderBottom: '1px solid #383058',
-      boxShadow: 'inset 0 0 8px rgba(90,80,120,0.15)',
-      zIndex: 1,
-    }} />
-  );
-}
+      {/* ── SKY ── */}
+      <rect x="0" y="0" width="100" height="100" fill="url(#vSky)" />
 
-function MutedTree({ x, y, s = 1 }) {
-  const w = Math.round(14 * s);
-  return (
-    <div style={{ position: 'absolute', top: `${y}%`, left: `${x}%`, pointerEvents: 'none', zIndex: 2 }}>
-      <div style={{ width: w, height: Math.round(w * 0.85), background: '#091308', borderRadius: '50% 50% 40% 40%', border: '1px solid #0d1a0c' }} />
-      <div style={{ width: Math.round(4 * s), height: Math.round(6 * s), background: '#090f07', margin: '0 auto' }} />
-    </div>
-  );
-}
+      {/* ── MOON ── */}
+      <circle cx="50" cy="9" r="13" fill="url(#vMoonHalo)" />
+      <circle cx="50" cy="9" r="4.2" fill="#ede0fa" opacity="0.9" />
+      <circle cx="52.4" cy="8.1" r="3.1" fill="#060118" />
 
-function AiraHouse() {
-  return (
-    <>
+      {/* ── Static stars (animated ones rendered as React divs) ── */}
+      <circle cx="12"  cy="4"  r="0.45" fill="#fff"     opacity="0.50" />
+      <circle cx="26"  cy="2"  r="0.35" fill="#fff"     opacity="0.40" />
+      <circle cx="39"  cy="5"  r="0.40" fill="#c5a3f5"  opacity="0.45" />
+      <circle cx="57"  cy="2"  r="0.35" fill="#fff"     opacity="0.45" />
+      <circle cx="71"  cy="4"  r="0.45" fill="#c5a3f5"  opacity="0.42" />
+      <circle cx="83"  cy="3"  r="0.35" fill="#fff"     opacity="0.48" />
+      <circle cx="91"  cy="6"  r="0.40" fill="#fff"     opacity="0.38" />
+      <circle cx="6"   cy="7"  r="0.35" fill="#a0c8e8"  opacity="0.35" />
+      <circle cx="96"  cy="5"  r="0.35" fill="#a0c8e8"  opacity="0.38" />
+
+      {/* ── GROUND ── */}
+      <rect x="0" y="20" width="100" height="80" fill="#0b1609" />
+      <rect x="4" y="27" width="92" height="65" fill="#0e1c0c" rx="3" />
+
+      {/* ── STONE PATHS ── */}
+      {/* Center vertical path */}
+      <rect x="40" y="36" width="8" height="64" fill="#524e7a" rx="1" />
+      <rect x="41" y="36" width="2" height="64" fill="#7874a4" opacity="0.32" />
+      {/* Cobblestone seams */}
+      {[41,46,51,56,61,66,71,76,81,86,91,96].map(y => (
+        <line key={y} x1="40" y1={y} x2="48" y2={y} stroke="#3a366a" strokeWidth="0.35" />
+      ))}
+
+      {/* Horizontal fork */}
+      <rect x="10" y="33" width="80" height="6" fill="#524e7a" rx="1" />
+      <rect x="10" y="33" width="80" height="1.5" fill="#7874a4" opacity="0.28" />
+      {[17,24,31,38,45,52,59,66,73,80].map(x => (
+        <line key={x} x1={x} y1="33" x2={x} y2="39" stroke="#3a366a" strokeWidth="0.35" />
+      ))}
+
+      {/* Left branch → Aira */}
+      <rect x="13" y="8"  width="6" height="27" fill="#524e7a" rx="1" />
+      <rect x="14" y="8"  width="2" height="27" fill="#7874a4" opacity="0.28" />
+      {[13,18,23,28].map(y => (
+        <line key={y} x1="13" y1={y} x2="19" y2={y} stroke="#3a366a" strokeWidth="0.35" />
+      ))}
+
+      {/* Right branch → Diary */}
+      <rect x="69" y="8"  width="6" height="27" fill="#524e7a" rx="1" />
+      <rect x="70" y="8"  width="2" height="27" fill="#7874a4" opacity="0.28" />
+      {[13,18,23,28].map(y => (
+        <line key={y} x1="69" y1={y} x2="75" y2={y} stroke="#3a366a" strokeWidth="0.35" />
+      ))}
+
+      {/* ── AIRA'S COTTAGE (top-left, x:2-23, y:2-33) ── */}
+      {/* Drop shadow */}
+      <rect x="3" y="28" width="22" height="3" fill="#030012" opacity="0.65" rx="1" />
       {/* Foundation */}
-      <div style={{ position: 'absolute', top: '30%', left: '3%', width: '20%', height: '3%', background: '#14102a', border: '1px solid #4028a0', zIndex: 2 }} />
+      <rect x="3"  y="26" width="21" height="3" fill="#1c1548" stroke="#3a2298" strokeWidth="0.4" rx="0.5" />
       {/* Main wall */}
-      <div style={{ position: 'absolute', top: '16%', left: '4%', width: '18%', height: '15%', background: '#1a1438', border: '2px solid #5030a0', zIndex: 2,
-        filter: 'drop-shadow(3px 6px 0 rgba(0,0,0,0.75))' }} />
+      <rect x="4"  y="12" width="19" height="15" fill="#161238" stroke="#4a30a8" strokeWidth="0.5" rx="0.5" />
       {/* Siding lines */}
-      {[19, 23, 27].map(y => (
-        <div key={y} style={{ position: 'absolute', top: `${y}%`, left: '4%', width: '18%', height: '1px', background: 'rgba(44,28,82,0.5)', zIndex: 3 }} />
+      {[15.5, 19, 22.5].map(y => (
+        <line key={y} x1="4" y1={y} x2="23" y2={y} stroke="#241856" strokeWidth="0.3" />
       ))}
+      {/* Chimney */}
+      <rect x="9" y="4" width="3.5" height="8" fill="#0c0a22" stroke="#281860" strokeWidth="0.3" />
+      <rect x="8.5" y="3.5" width="4.5" height="1.5" fill="#1a1438" stroke="#3a2480" strokeWidth="0.3" />
+      {/* Smoke puffs */}
+      <circle cx="11" cy="2.5" r="1.1" fill="#1c1830" opacity="0.55" />
+      <circle cx="12.5" cy="1.5" r="0.85" fill="#1c1830" opacity="0.38" />
+      <circle cx="10"   cy="1.2" r="0.7"  fill="#1c1830" opacity="0.28" />
       {/* Main roof */}
-      <div style={{ position: 'absolute', top: '7%', left: '2%', width: '22%', height: '10%', background: '#0b0920', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)', zIndex: 3 }} />
-      {/* Small turret */}
-      <div style={{ position: 'absolute', top: '8%', left: '11%', width: '6%', height: '6%', background: '#090718', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)', zIndex: 4 }} />
-      {/* Main window (glowing) */}
-      <div style={{
-        position: 'absolute', top: '18%', left: '8%', width: '8%', height: '6%',
-        background: 'rgba(130,55,180,0.6)', border: '2px solid #b070e0',
-        animation: 'windowGlow 2.8s ease-in-out infinite', zIndex: 4,
-      }}>
-        <div style={{ position: 'absolute', left: '48%', top: 0, width: 1, height: '100%', background: 'rgba(107,45,139,0.5)' }} />
-        <div style={{ position: 'absolute', top: '46%', left: 0, width: '100%', height: 1, background: 'rgba(107,45,139,0.5)' }} />
-      </div>
+      <polygon points="2,12 13.5,2.5 25,12" fill="#0a0820" stroke="#3a1a70" strokeWidth="0.4" />
+      {/* Roof ridge */}
+      <polygon points="8,11.8 13.5,7 19,11.8" fill="#080618" />
+      {/* Glowing window — large */}
+      <rect x="6"  y="15" width="7.5" height="6" fill="url(#vWinGlow)" stroke="#c080f8" strokeWidth="0.5" rx="0.4" />
+      <line x1="9.75" y1="15" x2="9.75" y2="21"   stroke="#6828a0" strokeWidth="0.3" />
+      <line x1="6"    y1="18" x2="13.5" y2="18"   stroke="#6828a0" strokeWidth="0.3" />
+      {/* Small side window */}
+      <rect x="16" y="15" width="4"   height="3.5" fill="#1e1440" stroke="#4a2880" strokeWidth="0.3" rx="0.3" />
       {/* Door */}
-      <div style={{ position: 'absolute', top: '24%', left: '10%', width: '5%', height: '6%', background: '#090718', border: '1px solid #3e2268', borderRadius: '2px 2px 0 0', zIndex: 4 }} />
-      <div style={{ position: 'absolute', top: '27%', left: '14.5%', width: '1%', height: '1%', background: '#c8a030', borderRadius: '50%', zIndex: 5 }} />
-      {/* Sign */}
-      <div style={{ position: 'absolute', top: '30.5%', left: '5%', fontFamily: "'Press Start 2P'", fontSize: '5px', color: '#c5a3f5', background: '#0a0618', border: '1px solid #4a2070', padding: '2px 4px', whiteSpace: 'nowrap', zIndex: 5 }}>아이라의 집</div>
+      <rect x="15.5" y="20" width="5" height="6.5" fill="#09061e" stroke="#3a1a60" strokeWidth="0.3" rx="0.4" />
+      <circle cx="19.5" cy="23.5" r="0.5" fill="#c8a030" />
       {/* Crystal pillars */}
-      <CrystalPost x={3.5} y={27} />
-      <CrystalPost x={20.5} y={27} />
-    </>
-  );
-}
+      <polygon points="3.8,27 5.2,23 6.6,27" fill="#b060e8" opacity="0.75" />
+      <circle cx="5.2" cy="23" r="1.2" fill="url(#vCrystalGlow)" />
+      <polygon points="19.4,27 20.8,23 22.2,27" fill="#b060e8" opacity="0.75" />
+      <circle cx="20.8" cy="23" r="1.2" fill="url(#vCrystalGlow)" />
+      {/* Sign */}
+      <rect x="4" y="28.5" width="13" height="3" fill="#0a0620" stroke="#38186a" strokeWidth="0.3" rx="0.4" />
 
-function DiaryBuilding() {
-  return (
-    <>
-      {/* Roof */}
-      <div style={{ position: 'absolute', top: '2%', left: '75%', width: '22%', height: '8%', background: '#090618', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)', zIndex: 3 }} />
-      {/* Wall */}
-      <div style={{
-        position: 'absolute', top: '8%', left: '76%', width: '20%', height: '16%',
-        background: '#16122e', border: '2px solid #3c2880', zIndex: 3,
-        filter: 'drop-shadow(3px 6px 0 rgba(0,0,0,0.75))',
-      }}>
-        {/* Wall lines */}
-        {[40, 70].map(p => (
-          <div key={p} style={{ position: 'absolute', top: `${p}%`, left: 0, width: '100%', height: 1, background: 'rgba(32,24,56,0.6)' }} />
-        ))}
-        {/* Lock + label */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 3 }}>
-          <div style={{ fontSize: '14px', animation: 'diaryFloat 2.4s ease-in-out infinite' }}>🔒</div>
-          <div style={{ fontFamily: "'Press Start 2P'", fontSize: '5px', color: '#5a4a88' }}>일기장</div>
-        </div>
-      </div>
+      {/* ── DIARY BUILDING (top-right, x:68-92, y:2-28) ── */}
+      {/* Drop shadow */}
+      <rect x="68" y="25" width="22" height="3" fill="#030012" opacity="0.65" rx="1" />
       {/* Foundation */}
-      <div style={{ position: 'absolute', top: '23%', left: '75%', width: '22%', height: '2%', background: '#120e28', border: '1px solid #3c2880', zIndex: 3 }} />
-    </>
-  );
-}
-
-function GrayZone() {
-  return (
-    <>
-      {/* Checkered stone floor — centered around main path */}
-      {GRAY_FLOOR.map((f, i) => (
-        <div key={i} style={{ position: 'absolute', top: `${f.y}%`, left: `${f.x}%`, width: `${f.w}%`, height: `${f.h}%`, background: f.c, border: '1px solid #1a163a', zIndex: 2 }} />
+      <rect x="69" y="23" width="20" height="3" fill="#100c28" stroke="#301870" strokeWidth="0.3" rx="0.5" />
+      {/* Wall */}
+      <rect x="70" y="9"  width="18" height="15" fill="#14102e" stroke="#302070" strokeWidth="0.5" rx="0.5" />
+      {/* Wall siding */}
+      {[12.5, 16, 19.5].map(y => (
+        <line key={y} x1="70" y1={y} x2="88" y2={y} stroke="#1e1848" strokeWidth="0.3" />
       ))}
-      <LampPost x={24} y={37} />
-      {/* Table top — left of center road */}
-      <div style={{ position: 'absolute', top: '55%', left: '25%', width: '18%', height: '4%', background: '#7c4520', border: '1px solid #5a3010', zIndex: 4 }} />
-      {/* Table legs */}
-      <div style={{ position: 'absolute', top: '59%', left: '26.5%', width: '2.5%', height: '3%', background: '#4a2c10', zIndex: 4 }} />
-      <div style={{ position: 'absolute', top: '59%', left: '40%',   width: '2.5%', height: '3%', background: '#4a2c10', zIndex: 4 }} />
-      {/* Cards on table */}
-      <div style={{ position: 'absolute', top: '55.5%', left: '26%', width: '4%', height: '5%', background: '#2a1a4a', border: '1px solid #c8a030', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '6px', zIndex: 5 }}>
-        <span style={{ color: '#c8a030' }}>✦</span>
-      </div>
-      <div style={{ position: 'absolute', top: '56%', left: '31%', width: '3.5%', height: '4.5%', background: '#2a1a4a', border: '1px solid #c8a030', transform: 'rotate(8deg)', zIndex: 5 }} />
-      <Candle x={42} y={48} />
-    </>
+      {/* Roof */}
+      <polygon points="67,9 79,1.5 91,9" fill="#09061e" stroke="#2a1860" strokeWidth="0.4" />
+      {/* Small dormers */}
+      <polygon points="72,8.8 75,5.5 78,8.8" fill="#0a0720" stroke="#241460" strokeWidth="0.3" />
+      <polygon points="80,8.8 83,5.5 86,8.8" fill="#0a0720" stroke="#241460" strokeWidth="0.3" />
+      {/* Padlock body */}
+      <circle cx="79" cy="15" r="2.8" fill="#1c1638" stroke="#48388a" strokeWidth="0.45" />
+      <rect   x="77" y="15" width="4"   height="3.2" fill="#1c1638" stroke="#48388a" strokeWidth="0.45" rx="0.4" />
+      {/* Lock shackle */}
+      <path d="M77.8,15 Q77.8,12.5 79,12.5 Q80.2,12.5 80.2,15" fill="none" stroke="#48388a" strokeWidth="0.5" />
+      {/* Keyhole */}
+      <circle cx="79" cy="15.8" r="0.8" fill="#362870" />
+      <rect   x="78.6" y="16.6" width="0.8" height="1.1" fill="#362870" />
+      {/* Small windows */}
+      <rect x="71" y="11" width="4" height="3.2" fill="#1e1440" stroke="#4030888" strokeWidth="0.3" rx="0.3" />
+      <rect x="83" y="11" width="4" height="3.2" fill="#1e1440" stroke="#403088" strokeWidth="0.3" rx="0.3" />
+      {/* Foundation line */}
+      <rect x="69" y="23" width="20" height="0.6" fill="#483888" opacity="0.6" />
+
+      {/* ── GRAY'S ZONE — stone floor, table, candle ── */}
+      {/* Stone floor */}
+      <rect x="26" y="40" width="30" height="24" fill="#1c1836" rx="2" />
+      {/* Floor tile grid */}
+      {[30,34,38,42,46,50].map(y => (
+        <line key={y} x1="26" y1={y} x2="56" y2={y} stroke="#28244a" strokeWidth="0.4" />
+      ))}
+      {[30,34,38,42,46,50,54].map(x => (
+        <line key={x} x1={x} y1="40" x2={x} y2="64" stroke="#28244a" strokeWidth="0.4" />
+      ))}
+      {/* Alternate tile shading */}
+      {[[26,40],[34,40],[42,40],[50,40],[30,44],[38,44],[46,44],[54,44],
+        [26,48],[34,48],[42,48],[50,48],[30,52],[38,52],[46,52],[54,52],
+        [26,56],[34,56],[42,56],[50,56],[30,60],[38,60],[46,60],[54,60],
+      ].map(([x,y],i) => (
+        <rect key={i} x={x} y={y} width="4" height="4" fill={i%2===0 ? '#252148' : '#111030'} opacity="0.55" />
+      ))}
+      {/* Table */}
+      <rect x="28" y="50" width="17" height="3.5" fill="#7a4018" stroke="#5a3010" strokeWidth="0.4" rx="0.5" />
+      <rect x="29.5" y="53.5" width="1.8" height="4" fill="#4a2c10" />
+      <rect x="42"   y="53.5" width="1.8" height="4" fill="#4a2c10" />
+      {/* Tarot cards on table */}
+      <rect x="30" y="46.8" width="5" height="6.5" fill="#2a1a4a" stroke="#c8a030" strokeWidth="0.45" rx="0.4" />
+      <text x="32.5" y="50.5" textAnchor="middle" fontSize="2.8" fill="#c8a030" opacity="0.85">✦</text>
+      <rect x="36.5" y="47.5" width="4.5" height="5.5" fill="#2a1a4a" stroke="#c8a030" strokeWidth="0.45" rx="0.4" transform="rotate(8,38.75,50.25)" />
+      {/* Candle */}
+      <rect x="45.5" y="49" width="2" height="3.5" fill="#ece0b8" rx="0.4" />
+      <ellipse cx="46.5" cy="48.5" rx="1" ry="1.5" fill="#ffe060" opacity="0.9" />
+      <ellipse cx="46.5" cy="48.5" rx="0.5" ry="0.6" fill="#fff" opacity="0.7" />
+      <circle  cx="46.5" cy="48.5" r="3.5"   fill="url(#vCandleGlow)" />
+      {/* Lamp post on left edge of zone */}
+      <rect x="27" y="37" width="1.4" height="11" fill="#201c38" />
+      <rect x="25.5" y="36.5" width="4" height="3" fill="rgba(255,220,80,0.6)" stroke="#6a5020" strokeWidth="0.35" rx="0.5" />
+      <circle cx="27.7" cy="37" r="4.5" fill="url(#vLampGlow)" />
+
+      {/* ── STARTING AREA (bottom center) ── */}
+      {/* Entry stones */}
+      <rect x="38" y="74" width="14" height="4.5" fill="#2a2848" stroke="#3e3a68" strokeWidth="0.4" rx="1.2" />
+      <rect x="40" y="77" width="10" height="3.5" fill="#323058" stroke="#4a4670" strokeWidth="0.4" rx="1" />
+      {/* Lantern at start */}
+      <rect x="35" y="74" width="1.2" height="8" fill="#201c38" />
+      <rect x="34" y="73.5" width="3.2" height="2.5" fill="rgba(255,220,80,0.55)" stroke="#6a5020" strokeWidth="0.3" rx="0.4" />
+      <circle cx="35.6" cy="73.5" r="3.5" fill="url(#vLampGlow)" />
+      {/* Flowers left */}
+      <circle cx="32"  cy="74.5" r="1.6" fill="#8a4a6a" />
+      <circle cx="30"  cy="76.5" r="1.2" fill="#7a3858" />
+      <circle cx="34"  cy="77.5" r="1.3" fill="#6a5a9a" />
+      <circle cx="29.5" cy="78.5" r="0.9" fill="#8a4a6a" opacity="0.7" />
+      {/* Flower stems */}
+      <line x1="32" y1="76" x2="32" y2="78" stroke="#1a3010" strokeWidth="0.5" />
+      <line x1="30" y1="77.5" x2="30" y2="79" stroke="#1a3010" strokeWidth="0.5" />
+      {/* Flowers right */}
+      <circle cx="58"  cy="74.5" r="1.6" fill="#6a5a9a" />
+      <circle cx="60"  cy="76.5" r="1.2" fill="#7a6aaa" />
+      <circle cx="56"  cy="77.5" r="1.3" fill="#8a4a6a" />
+      <circle cx="60.5" cy="78.5" r="0.9" fill="#6a5a9a" opacity="0.7" />
+      <line x1="58" y1="76" x2="58" y2="78" stroke="#1a3010" strokeWidth="0.5" />
+      <line x1="60" y1="77.5" x2="60" y2="79" stroke="#1a3010" strokeWidth="0.5" />
+      {/* Grass tufts near entrance */}
+      {[[33,80],[35,81.5],[37,80.5],[55,80],[57,81.5],[59,80.5]].map(([x,y],i) => (
+        <ellipse key={i} cx={x} cy={y} rx="1.1" ry="0.7" fill="#1c3414" opacity="0.85" />
+      ))}
+
+      {/* ── BORDER TREES (left edge) ── */}
+      {[
+        [1, 12, 1.2], [0, 26, 1.0], [1, 42, 1.1],
+        [0, 58, 1.0], [1, 74, 1.2],
+      ].map(([x, y, s], i) => (
+        <g key={i}>
+          <rect x={x + 2} y={y + 4} width={3.5 * s} height={5.5 * s} fill="#07100a" />
+          <ellipse cx={x + 4} cy={y}     rx={5.8 * s} ry={5.2 * s} fill="#0a1608" />
+          <ellipse cx={x + 4} cy={y}     rx={4.5 * s} ry={4.0 * s} fill="#0d1e0c" opacity="0.7" />
+          <ellipse cx={x + 5} cy={y - 1} rx={2.5 * s} ry={2.0 * s} fill="#142a12" opacity="0.45" />
+        </g>
+      ))}
+
+      {/* ── BORDER TREES (right edge) ── */}
+      {[
+        [91, 12, 1.2], [92, 26, 1.0], [91, 42, 1.1],
+        [92, 58, 1.0], [91, 74, 1.2],
+      ].map(([x, y, s], i) => (
+        <g key={i}>
+          <rect x={x + 2} y={y + 4} width={3.5 * s} height={5.5 * s} fill="#07100a" />
+          <ellipse cx={x + 4} cy={y}     rx={5.8 * s} ry={5.2 * s} fill="#0a1608" />
+          <ellipse cx={x + 4} cy={y}     rx={4.5 * s} ry={4.0 * s} fill="#0d1e0c" opacity="0.7" />
+          <ellipse cx={x + 3} cy={y - 1} rx={2.5 * s} ry={2.0 * s} fill="#142a12" opacity="0.45" />
+        </g>
+      ))}
+
+      {/* ── CORNER + TOP TREES ── */}
+      <ellipse cx="2"  cy="22" rx="4.5" ry="3.5" fill="#091408" />
+      <ellipse cx="98" cy="22" rx="4.5" ry="3.5" fill="#091408" />
+      {/* Center top tree (between Aira and Diary) */}
+      <rect x="44.5" y="24" width="3" height="6" fill="#07100a" />
+      <ellipse cx="46"  cy="22" rx="5.5" ry="4.5" fill="#0a1608" />
+      <ellipse cx="46"  cy="21" rx="3.5" ry="3.0" fill="#0e1e0c" opacity="0.6" />
+
+      {/* ── DEPTH GRADIENT overlay ── */}
+      <rect x="0" y="0" width="100" height="100" fill="url(#vDepth)" />
+    </svg>
   );
 }
-
-function LampPost({ x, y }) {
-  return (
-    <div style={{ position: 'absolute', top: `${y}%`, left: `${x}%`, pointerEvents: 'none', zIndex: 3 }}>
-      <div style={{ width: 11, height: 9, background: 'rgba(255,218,70,0.55)', border: '1px solid #6a5020', boxShadow: '0 0 28px rgba(255,200,50,0.70)', margin: '0 auto' }} />
-      <div style={{ width: 3, height: 30, background: '#201c38', margin: '0 auto' }} />
-    </div>
-  );
-}
-
-function Candle({ x, y }) {
-  return (
-    <div style={{ position: 'absolute', top: `${y}%`, left: `${x}%`, pointerEvents: 'none', zIndex: 5 }}>
-      <div style={{ width: 6, height: 8, background: 'radial-gradient(circle at 50% 70%, #ffe060, #ff8800, transparent)', borderRadius: '50% 50% 30% 30%', margin: '0 auto', animation: 'candleFlicker 1.1s ease-in-out infinite alternate', boxShadow: '0 0 18px rgba(255,180,30,0.75)' }} />
-      <div style={{ width: 4, height: 10, background: '#e8d8b0', margin: '0 auto' }} />
-    </div>
-  );
-}
-
-function CrystalPost({ x, y }) {
-  return (
-    <div style={{
-      position: 'absolute', top: `${y}%`, left: `${x}%`,
-      width: '2.2%', height: '6%',
-      background: 'linear-gradient(180deg, #a060e0 0%, #5a1a8a 100%)',
-      clipPath: 'polygon(50% 0%, 100% 22%, 80% 100%, 20% 100%, 0% 22%)',
-      boxShadow: '0 0 8px rgba(150,60,200,0.5)',
-      animation: 'crystalPulse 2.5s ease-in-out infinite',
-      pointerEvents: 'none', zIndex: 5,
-    }} />
-  );
-}
-
-// ── Static data ───────────────────────────────────────────────────────────────
-const GRASS = [
-  { x: 0,  y: 0,  w: 100, h: 100, c: '#0d1c0b' },
-  { x: 0,  y: 0,  w: 55,  h: 14,  c: '#112013' },
-  { x: 55, y: 0,  w: 45,  h: 12,  c: '#112013' },
-  { x: 0,  y: 40, w: 14,  h: 22,  c: '#0e1b0c' },
-  { x: 86, y: 40, w: 14,  h: 22,  c: '#0e1b0c' },
-  { x: 12, y: 64, w: 76,  h: 36,  c: '#0f1e0d' },
-];
-
-// Gray's floor — centered around main path (x 24-52%, y 43-63%)
-const GRAY_FLOOR = [
-  { x: 24, y: 43, w: 7, h: 5, c: '#2c2850' }, { x: 31, y: 43, w: 7, h: 5, c: '#110e28' },
-  { x: 38, y: 43, w: 7, h: 5, c: '#2c2850' }, { x: 45, y: 43, w: 7, h: 5, c: '#110e28' },
-  { x: 24, y: 48, w: 7, h: 5, c: '#110e28' }, { x: 31, y: 48, w: 7, h: 5, c: '#2c2850' },
-  { x: 38, y: 48, w: 7, h: 5, c: '#110e28' }, { x: 45, y: 48, w: 7, h: 5, c: '#2c2850' },
-  { x: 24, y: 53, w: 7, h: 5, c: '#2c2850' }, { x: 31, y: 53, w: 7, h: 5, c: '#110e28' },
-  { x: 38, y: 53, w: 7, h: 5, c: '#2c2850' }, { x: 45, y: 53, w: 7, h: 5, c: '#110e28' },
-  { x: 24, y: 58, w: 7, h: 4, c: '#110e28' }, { x: 31, y: 58, w: 7, h: 4, c: '#2c2850' },
-  { x: 38, y: 58, w: 7, h: 4, c: '#110e28' }, { x: 45, y: 58, w: 7, h: 4, c: '#2c2850' },
-];
-
-const TREES = [
-  { x: 0,  y: 4,  s: 1.2 }, { x: 0,  y: 22, s: 1.0 }, { x: 0,  y: 42, s: 1.1 },
-  { x: 0,  y: 62, s: 1.0 }, { x: 0,  y: 80, s: 1.2 },
-  { x: 93, y: 4,  s: 1.2 }, { x: 93, y: 22, s: 1.0 }, { x: 93, y: 44, s: 1.1 },
-  { x: 93, y: 62, s: 1.0 }, { x: 93, y: 80, s: 1.2 },
-  { x: 44, y: 1,  s: 1.0 },
-];
 
 const STARS = [
   { x: 8,  y: 1, sz: 2, op: 0.7,  dur: 2.1, del: 0   },

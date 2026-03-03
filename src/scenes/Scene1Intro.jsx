@@ -75,7 +75,7 @@ export default function Scene1Intro({ user, authLoaded, onNext }) {
           style={{
             width: '100%', height: '100%',
             objectFit: 'cover', objectPosition: 'center 40%',
-            filter: 'brightness(0.58) saturate(0.82)',
+            filter: 'brightness(0.78) saturate(0.92)',
             display: 'block',
           }}
         />
@@ -84,7 +84,7 @@ export default function Scene1Intro({ user, authLoaded, onNext }) {
       {/* ── 2. Purple atmosphere overlay ── */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'linear-gradient(160deg, rgba(48,8,90,0.52) 0%, rgba(22,4,55,0.38) 50%, rgba(10,2,35,0.58) 100%)',
+        background: 'linear-gradient(160deg, rgba(48,8,90,0.32) 0%, rgba(22,4,55,0.22) 50%, rgba(10,2,35,0.38) 100%)',
       }} />
 
       {/* ── 3. Moon glow — upper-center matching image ── */}
@@ -214,7 +214,7 @@ export default function Scene1Intro({ user, authLoaded, onNext }) {
       {/* ── 8. Vignette ── */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse at 50% 42%, transparent 28%, rgba(0,0,0,0.78) 100%)',
+        background: 'radial-gradient(ellipse at 50% 42%, transparent 32%, rgba(0,0,0,0.52) 100%)',
         zIndex: 4,
       }} />
 

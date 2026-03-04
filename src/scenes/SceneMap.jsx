@@ -421,7 +421,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
           title="그레이 (무료 오늘의 점괘)"
           style={{
             position: 'absolute', top: `${GRAY_POS.y}%`, left: `${GRAY_POS.x}%`,
-            transform: 'scale(2.8)', transformOrigin: 'bottom center',
+            transform: 'scale(3.5)', transformOrigin: 'bottom center',
             imageRendering: 'pixelated',
             cursor: !walking && dialogPhase === 'none' ? 'pointer' : 'default',
             filter: destination === 'gray'
@@ -454,7 +454,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
         <div style={{
           position: 'absolute',
           top: `${protagonistPos.y}%`, left: `${protagonistPos.x}%`,
-          transform: `scale(2.8) scaleX(${facing})`, transformOrigin: 'bottom center',
+          transform: `scale(3.5) scaleX(${facing})`, transformOrigin: 'bottom center',
           imageRendering: 'pixelated',
           transition: walking
             ? `top ${protagonistDur}ms linear, left ${protagonistDur}ms linear`

@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../styles/pixelart.css';
 
-export default function PixelWitch({ x = 300, visible = true, scale = 1.5 }) {
+export default function PixelWitch({ x = 300, visible = true, scale = 1.8 }) {
   if (!visible) return null;
   return (
     <div style={{
@@ -14,9 +14,9 @@ export default function PixelWitch({ x = 300, visible = true, scale = 1.5 }) {
       animation: 'idle-bob 1.4s ease-in-out infinite',
     }}>
       <img 
-        src="/intro/aira_new.png" 
+        src="/intro/aira_dot_v4.png" 
         alt="Aira" 
-        style={{ width: '64px', height: 'auto', display: 'block' }} 
+        style={{ width: '80px', height: 'auto', display: 'block' }} 
       />
     </div>
   );
@@ -24,9 +24,9 @@ export default function PixelWitch({ x = 300, visible = true, scale = 1.5 }) {
 
 export function WitchSprite({ style = {} }) {
   return (
-    <div style={{ position: 'relative', width: 64, height: 64, imageRendering: 'pixelated', ...style }}>
+    <div style={{ position: 'relative', width: 80, height: 80, imageRendering: 'pixelated', ...style }}>
       <img 
-        src="/intro/aira_new.png" 
+        src="/intro/aira_dot_v4.png" 
         alt="Aira" 
         style={{ width: '100%', height: '100%', display: 'block' }} 
       />
@@ -36,9 +36,9 @@ export function WitchSprite({ style = {} }) {
 
 export function ChibiWitchSprite() {
   return (
-    <div style={{ position: 'relative', width: 32, height: 32, imageRendering: 'pixelated' }}>
+    <div style={{ position: 'relative', width: 56, height: 56, imageRendering: 'pixelated' }}>
       <img 
-        src="/intro/aira_new.png" 
+        src="/intro/aira_dot_v4.png" 
         alt="Aira Chibi" 
         style={{ width: '100%', height: '100%', display: 'block' }} 
       />

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import '../../styles/pixelart.css';
 
-export default function PixelChild({ x = 60, animate = 'idle', onWalkDone, scale = 1.5, showBack = false }) {
+export default function PixelChild({ x = 60, animate = 'idle', onWalkDone, scale = 1.8, showBack = false }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -31,13 +31,13 @@ export default function PixelChild({ x = 60, animate = 'idle', onWalkDone, scale
 
 export function ChildSprite({ walking = false, showBack = false, style = {} }) {
   const bobAnim = walking ? 'childWalkBob 0.3s ease-in-out infinite alternate' : 'none';
-  const imgSrc = showBack ? '/intro/protagonist_back.png' : '/intro/protagonist_front.png';
+  const imgSrc = showBack ? '/intro/protagonist_back_dot_v4.png' : '/intro/protagonist_front_dot_v4.png';
 
   return (
     <div style={{ 
       position: 'relative', 
-      width: 64, 
-      height: 64, 
+      width: 80, 
+      height: 80, 
       imageRendering: 'pixelated', 
       animation: bobAnim, 
       ...style 
@@ -55,9 +55,9 @@ export function ChildSprite({ walking = false, showBack = false, style = {} }) {
 }
 
 export function ChibiChildSprite({ showBack = false }) {
-  const imgSrc = showBack ? '/intro/protagonist_back.png' : '/intro/protagonist_front.png';
+  const imgSrc = showBack ? '/intro/protagonist_back_dot_v4.png' : '/intro/protagonist_front_dot_v4.png';
   return (
-    <div style={{ position: 'relative', width: 32, height: 32, imageRendering: 'pixelated' }}>
+    <div style={{ position: 'relative', width: 56, height: 56, imageRendering: 'pixelated' }}>
       <img 
         src={imgSrc} 
         alt="Protagonist Chibi" 

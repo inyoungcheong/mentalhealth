@@ -15,9 +15,9 @@ export default function PixelGray({ style = {} }) {
 
 export function GraySprite({ style = {} }) {
   return (
-    <div style={{ position: 'relative', width: 64, height: 64, imageRendering: 'pixelated', ...style }}>
+    <div style={{ position: 'relative', width: 80, height: 80, imageRendering: 'pixelated', ...style }}>
       <img 
-        src="/intro/gray_new.png" 
+        src="/intro/gray_dot_v4.png" 
         alt="Gray" 
         style={{ width: '100%', height: '100%', display: 'block' }} 
       />
@@ -27,9 +27,9 @@ export function GraySprite({ style = {} }) {
 
 export function ChibiGraySprite() {
   return (
-    <div style={{ position: 'relative', width: 32, height: 32, imageRendering: 'pixelated' }}>
+    <div style={{ position: 'relative', width: 56, height: 56, imageRendering: 'pixelated' }}>
       <img 
-        src="/intro/gray_new.png" 
+        src="/intro/gray_dot_v4.png" 
         alt="Gray Chibi" 
         style={{ width: '100%', height: '100%', display: 'block' }} 
       />

@@ -461,7 +461,7 @@ export default function SceneMap({ isNew, lastVisitAt, luaBalance, onNext }) {
             : 'none',
           zIndex: 6,
         }}>
-          <ChibiChildSprite walking={walking} />
+          <ChibiChildSprite walking={walking} showBack={walking || isDialogOpen} />
         </div>
       </div>
 

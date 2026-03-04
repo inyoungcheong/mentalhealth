@@ -155,7 +155,7 @@ export default function Scene2Village({ isNew, lastVisitAt, onNext }) {
           imageRendering: 'pixelated',
           transition: isWalking ? 'left 2.5s linear' : 'none',
         }}>
-          <ChildSprite walking={isWalking} />
+          <ChildSprite walking={isWalking} showBack={phase === 'chat' || phase === 'witch-appear'} />
         </div>
 
         {/* Witch character */}
@@ -178,16 +178,30 @@ export default function Scene2Village({ isNew, lastVisitAt, onNext }) {
         {/* Chat bubble */}
         {phase === 'chat' && lineIdx < chatLines.length && (
           <div style={{
-            position: 'absolute',
-            bottom: 160,
-            right: 40,
-            maxWidth: '60%',
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: '100%',
+            height: '40vh',
+            background: 'rgba(255,255,255,0.98)',
+            borderTop: '4px solid #6b2d8b',
+            padding: '24px 32px',
+            boxShadow: '0 -8px 24px rgba(0,0,0,0.5)',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
           }}>
+            <div style={{
+              fontFamily: "'Press Start 2P'", fontSize: '12px',
+              color: '#6b2d8b', marginBottom: 12, fontWeight: 'bold'
+            }}>아이라</div>
             <ChatBubble
               key={lineIdx}
               text={chatLines[lineIdx]}
               speaker="witch"
               onDone={handleBubbleDone}
+              style={{ border: 'none', background: 'transparent', padding: 0, boxShadow: 'none' }}
             />
           </div>
         )}
